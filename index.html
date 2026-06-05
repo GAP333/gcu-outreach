@@ -863,7 +863,6 @@ function renderList(){
   const faithOnly = document.getElementById('list-faith').value==='faith';
   const azOnly = document.getElementById('list-az').value==='az';
 
-  const azOnly = document.getElementById('list-az').value==='az';
 
   let filtered = people.filter(p=>{
     if(currentFilter==='high' && p.priority!=='high') return false;
