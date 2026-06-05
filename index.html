@@ -171,6 +171,9 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#fff;c
 
 footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px solid #f0f0f0}
 
+.status-select{padding:6px 28px 6px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#111;background:#fff;outline:none;cursor:pointer;appearance:auto;transition:border-color 0.2s}
+.status-select:focus{border-color:#4f46e5}
+
 @media(max-width:640px){
   .nav{padding:0 16px}
   .hero{padding:40px 16px 32px}
@@ -652,13 +655,21 @@ function showDetail(id){
   // Badges
   const reachClass = p.priority==='high'?'badge-reach-green':'badge-reach-yellow';
   const reachLabel = p.priority==='high'?'🟢 Reach out now':p.priority==='medium'?'🟡 High potential':'Low priority';
+  const statusOptions = ['Needs to be Contacted','Not contacted','Contacted','Meeting booked','Passed'];
+  const currentStatus = p.status || 'Needs to be Contacted';
   document.getElementById('d-badges').innerHTML = `
-    <div class="detail-badge badge-status">● Needs to be Contacted ▾</div>
+    <div style="position:relative;display:inline-block">
+      <select class="status-select" onchange="updateStatus(${p.id}, this.value)">
+        ${statusOptions.map(o=>`<option value="${o}" ${o===currentStatus?'selected':''}>${o}</option>`).join('')}
+      </select>
+    </div>
     <div class="detail-badge ${reachClass}">${reachLabel}</div>`;
 
   document.getElementById('d-bio').textContent = p.bio||'No biography available.';
   document.getElementById('d-approach').textContent = p.approach||'No approach strategy added yet.';
-  document.getElementById('d-contact').textContent = p.email ? p.email : 'No direct contact info available. See Best Approach for recommended outreach path.';
+  document.getElementById('d-contact').innerHTML = p.email
+    ? `<a href="mailto:${p.email}" style="color:#4f46e5;font-weight:600;text-decoration:none">${p.email}</a><br><span style="font-size:12px;color:#888;margin-top:4px;display:block">${p.approach||''}</span>`
+    : `<span style="color:#888">No direct contact info available.</span><br><span style="font-size:12.5px;color:#333;margin-top:6px;display:block">${p.approach||'See Best Approach for recommended outreach path.'}</span>`;
   document.getElementById('d-gcu').textContent = p.angle||'No GCU connection angle added yet.';
   document.getElementById('d-faith').textContent = p.faith||'Faith background not confirmed.';
 
@@ -744,6 +755,15 @@ function savePerson(){
     people.push({id:maxId+1,...data});
   }
   closeForm(); populateCatFilter(); renderList(); updateStats();
+}
+
+function updateStatus(id, status){
+  const p = people.find(x=>x.id===id);
+  if(!p) return;
+  p.status = status;
+  p.contacted = status==='Contacted' || status==='Meeting booked';
+  p.meetings = status==='Meeting booked' ? 1 : (p.meetings||0);
+  updateStats();
 }
 
 function deletePerson(id){
