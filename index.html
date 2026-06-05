@@ -15,8 +15,9 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#fff;c
 
 /* NAV */
 .nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #f0f0f0;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{display:flex;align-items:center;gap:10px}
-.nav-logo-box{width:32px;height:32px;background:#4f46e5;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;letter-spacing:-0.5px}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.nav-logo:hover .nav-logo-box{background:#4338ca}
+.nav-logo-box{width:32px;height:32px;background:#4f46e5;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;letter-spacing:-0.5px;transition:background 0.15s}
 .nav-logo-text{font-size:15px;font-weight:600;color:#111}
 .nav-center{display:flex;align-items:center;gap:20px;font-size:13px;color:#555}
 .nav-dot-green{color:#16a34a;font-weight:600}
@@ -171,6 +172,12 @@ html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#fff;c
 
 footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px solid #f0f0f0}
 
+.detail-nav-arrows{display:flex;align-items:center;gap:8px}
+.arrow-btn{padding:7px 14px;border:1.5px solid #e0e0e0;border-radius:8px;background:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#111;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.15s}
+.arrow-btn:hover:not(:disabled){background:#f5f5f5;border-color:#ccc}
+.arrow-btn:disabled{opacity:0.35;cursor:not-allowed}
+.arrow-counter{font-size:12px;color:#999;white-space:nowrap}
+
 .status-select{padding:6px 28px 6px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#111;background:#fff;outline:none;cursor:pointer;appearance:auto;transition:border-color 0.2s}
 .status-select:focus{border-color:#4f46e5}
 
@@ -188,7 +195,7 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
 
 <!-- NAV -->
 <nav class="nav">
-  <div class="nav-logo">
+  <div class="nav-logo" onclick="showHero()">
     <div class="nav-logo-box">GCU</div>
     <span class="nav-logo-text">Prospect Intelligence</span>
   </div>
@@ -276,10 +283,17 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
       <div class="detail-role" id="d-role"></div>
       <div class="detail-org" id="d-org"></div>
     </div>
-    <div class="detail-progress-wrap">
-      <span id="d-score-label"></span>
-      <div class="detail-progress-bar"><div class="detail-progress-fill" id="d-progress"></div></div>
-      <span>out of 100</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+      <div class="detail-progress-wrap">
+        <span id="d-score-label"></span>
+        <div class="detail-progress-bar"><div class="detail-progress-fill" id="d-progress"></div></div>
+        <span>out of 100</span>
+      </div>
+      <div class="detail-nav-arrows">
+        <button class="arrow-btn" id="btn-prev" onclick="navigateDetail(-1)">← Prev</button>
+        <span class="arrow-counter" id="d-counter"></span>
+        <button class="arrow-btn" id="btn-next" onclick="navigateDetail(1)">Next →</button>
+      </div>
     </div>
   </div>
   <div class="detail-badges" id="d-badges"></div>
@@ -523,6 +537,31 @@ let people = [
 let currentFilter = 'all';
 let lastListFilter = 'all';
 let editingId = null;
+let currentDetailId = null;
+let filteredPeopleCache = [];
+
+function getFilteredPeople(){
+  const q = document.getElementById('list-search') ? document.getElementById('list-search').value.toLowerCase() : '';
+  const cat = document.getElementById('list-cat') ? document.getElementById('list-cat').value : '';
+  const faithOnly = document.getElementById('list-faith') ? document.getElementById('list-faith').value==='faith' : false;
+  return people.filter(p=>{
+    if(currentFilter==='high' && p.priority!=='high') return false;
+    if(currentFilter==='medium' && p.priority!=='medium') return false;
+    if(currentFilter==='faith' && !p.faith_confirmed) return false;
+    if(cat && p.category!==cat) return false;
+    if(faithOnly && !p.faith_confirmed) return false;
+    const txt=[p.name,p.org,p.category,p.role,p.bio,p.location,...(p.tags||[])].join(' ').toLowerCase();
+    if(q && !txt.includes(q)) return false;
+    return true;
+  });
+}
+
+function navigateDetail(dir){
+  const list = filteredPeopleCache;
+  const idx = list.findIndex(p=>p.id===currentDetailId);
+  const newIdx = idx + dir;
+  if(newIdx >= 0 && newIdx < list.length) showDetail(list[newIdx].id);
+}
 
 function initials(n){ return n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]||'').join('').toUpperCase(); }
 
@@ -639,9 +678,17 @@ function renderList(){
 function showDetail(id){
   const p = people.find(x=>x.id===id);
   if(!p) return;
+  currentDetailId = id;
+  filteredPeopleCache = getFilteredPeople();
 
   document.getElementById('page-list').classList.remove('active');
   document.getElementById('page-detail').classList.add('active');
+
+  // Prev/next
+  const idx = filteredPeopleCache.findIndex(x=>x.id===id);
+  document.getElementById('d-counter').textContent = (idx+1) + ' of ' + filteredPeopleCache.length;
+  document.getElementById('btn-prev').disabled = idx <= 0;
+  document.getElementById('btn-next').disabled = idx >= filteredPeopleCache.length - 1;
 
   document.getElementById('d-name').textContent = p.name;
   document.getElementById('d-role').textContent = p.role||'';
