@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCU Prospect Intelligence – Outreach Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #122040;
+    --navy-light: #1a3060;
+    --gold: #c8952a;
+    --gold-light: #e8b84b;
+    --cream: #f7f3ed;
+    --card-bg: #ffffff;
+    --text-dark: #1a1a2e;
+    --text-mid: #4a5568;
+    --text-light: #718096;
+    --border: #e2d9cc;
+    --shadow: 0 2px 16px rgba(10,22,40,0.08);
+    --shadow-hover: 0 8px 32px rgba(10,22,40,0.18);
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --yellow: #d97706;
+    --yellow-light: #fef3c7;
+    --blue: #1d4ed8;
+    --blue-light: #dbeafe;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.35);
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  .header-logo {
+    width: 44px;
+    height: 44px;
+    background: var(--gold);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+  }
+
+  .header-title h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .header-title p {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 2px;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+  }
+
+  .add-btn {
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .add-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* CONTROLS */
+  .controls {
+    max-width: 1400px;
+    margin: 24px auto 0;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+  }
+
+  .search-wrap input {
+    width: 100%;
+    padding: 11px 14px 11px 42px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus { border-color: var(--gold); }
+
+  .filter-select {
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text-dark);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .filter-select:focus { border-color: var(--gold); }
+
+  .count-badge {
+    background: var(--navy);
+    color: var(--gold-light);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  /* GRID */
+  .grid-container {
+    max-width: 1400px;
+    margin: 20px auto 0;
+    padding: 0 32px 60px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: all 0.25s;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-3px);
+    border-color: rgba(200,149,42,0.4);
+  }
+
+  .card-header {
+    padding: 18px 20px 14px;
+    background: var(--navy);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+  }
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--navy);
+    flex-shrink: 0;
+    letter-spacing: -0.5px;
+  }
+
+  .card-identity { flex: 1; min-width: 0; }
+
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 3px;
+  }
+
+  .card-role {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.3px;
+  }
+
+  .card-org {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-badges {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .badge {
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .badge-faith { background: rgba(22,163,74,0.2); color: #86efac; border: 1px solid rgba(22,163,74,0.3); }
+  .badge-sports { background: rgba(29,78,216,0.2); color: #93c5fd; border: 1px solid rgba(29,78,216,0.3); }
+  .badge-media { background: rgba(139,92,246,0.2); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3); }
+  .badge-construction { background: rgba(234,88,12,0.2); color: #fdba74; border: 1px solid rgba(234,88,12,0.3); }
+  .badge-hospitality { background: rgba(6,182,212,0.2); color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+  .badge-entrepreneur { background: rgba(200,149,42,0.2); color: #fde68a; border: 1px solid rgba(200,149,42,0.4); }
+  .badge-tech { background: rgba(99,102,241,0.2); color: #c7d2fe; border: 1px solid rgba(99,102,241,0.3); }
+  .badge-realestate { background: rgba(20,184,166,0.2); color: #99f6e4; border: 1px solid rgba(20,184,166,0.3); }
+  .badge-automotive { background: rgba(245,158,11,0.2); color: #fde68a; border: 1px solid rgba(245,158,11,0.3); }
+  .badge-law { background: rgba(220,38,38,0.2); color: #fca5a5; border: 1px solid rgba(220,38,38,0.3); }
+  .badge-entertainment { background: rgba(236,72,153,0.2); color: #f9a8d4; border: 1px solid rgba(236,72,153,0.3); }
+
+  .card-body { padding: 16px 20px 14px; }
+
+  .card-bio {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-mid);
+    margin-bottom: 12px;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .tag {
+    padding: 3px 10px;
+    background: #f1ede6;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-mid);
+    letter-spacing: 0.3px;
+  }
+
+  .tag-faith {
+    background: var(--green-light);
+    color: var(--green);
+  }
+
+  .tag-hotpick {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .meta-label {
+    font-weight: 700;
+    color: var(--text-dark);
+    min-width: 60px;
+    flex-shrink: 0;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding-top: 1px;
+  }
+
+  .meta-value {
+    color: var(--text-mid);
+    line-height: 1.5;
+  }
+
+  .meta-value a {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .meta-value a:hover { text-decoration: underline; }
+
+  .card-footer {
+    padding: 12px 20px;
+    background: #fafaf8;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .priority-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-high { background: var(--green); box-shadow: 0 0 6px rgba(22,163,74,0.4); }
+  .dot-medium { background: var(--yellow); box-shadow: 0 0 6px rgba(217,119,6,0.4); }
+  .dot-low { background: var(--text-light); }
+
+  .priority-high { color: var(--green); }
+  .priority-medium { color: var(--yellow); }
+  .priority-low { color: var(--text-light); }
+
+  .card-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .btn-action {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-edit {
+    background: #f0ede8;
+    color: var(--text-dark);
+  }
+
+  .btn-edit:hover { background: #e4dfd7; }
+
+  .btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  .btn-delete:hover { background: #fecaca; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,22,40,0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card-bg);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+  }
+
+  .modal-header {
+    padding: 24px 28px 16px;
+    background: var(--navy);
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .modal-close:hover { background: rgba(255,255,255,0.2); }
+
+  .modal-body { padding: 24px 28px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dark);
+  }
+
+  .form-input, .form-textarea, .form-select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    outline: none;
+    background: #fafaf8;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--gold); }
+
+  .form-textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
+
+  .modal-footer {
+    padding: 16px 28px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-cancel {
+    padding: 10px 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-mid);
+    transition: all 0.2s;
+  }
+
+  .btn-cancel:hover { background: var(--cream); }
+
+  .btn-save {
+    padding: 10px 24px;
+    background: var(--navy);
+    color: var(--gold-light);
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-save:hover { background: var(--navy-light); }
+
+  /* FLAG CARD */
+  .flag-card {
+    background: #fff8ed;
+    border: 1.5px dashed var(--gold);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .flag-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .flag-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-dark);
+  }
+
+  .flag-note {
+    font-size: 13px;
+    color: var(--text-mid);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* EMPTY */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-light);
+  }
+
+  .empty-state svg {
+    margin: 0 auto 16px;
+    display: block;
+    opacity: 0.3;
+  }
+
+  footer {
+    background: var(--navy);
+    text-align: center;
+    padding: 18px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+  }
+
+  footer span { color: var(--gold); }
+
+  @media (max-width: 600px) {
+    .header-inner { padding: 14px 16px; }
+    .controls { padding: 0 16px; }
+    .grid-container { padding: 0 16px 40px; }
+    .grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .header-stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">GCU</div>
+      <div class="header-title">
+        <h1>Prospect Intelligence</h1>
+        <p>GCU Outreach Dashboard</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <span class="stat-num" id="total-count">0</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="shown-count">0</span>
+        <span class="stat-label">Shown</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="faith-count">0</span>
+        <span class="stat-label">Faith ✓</span>
+      </div>
+    </div>
+    <button class="add-btn" onclick="openModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Prospect
+    </button>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" id="search" placeholder="Search by name, company, category…" oninput="render()">
+  </div>
+  <select class="filter-select" id="cat-filter" onchange="render()">
+    <option value="">All Categories</option>
+  </select>
+  <select class="filter-select" id="faith-filter" onchange="render()">
+    <option value="">All Prospects</option>
+    <option value="faith">Faith Confirmed ✓</option>
+  </select>
+  <div class="count-badge" id="count-display">Loading…</div>
+</div>
+
+<div class="grid-container">
+  <div class="grid" id="card-grid"></div>
+</div>
+
+<footer>Grand Canyon University &nbsp;·&nbsp; <span>Prospect Intelligence</span> &nbsp;·&nbsp; Outreach Edition &nbsp;·&nbsp; Sam Otto
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">ADD PROSPECT</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Name *</label>
+          <input class="form-input" id="f-name" placeholder="Full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role / Title</label>
+          <input class="form-input" id="f-role" placeholder="CEO, Founder, Player…">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Company / Org</label>
+          <input class="form-input" id="f-org" placeholder="Company or organization">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="f-category">
+            <option value="">Select category</option>
+            <option value="Entrepreneur">Entrepreneur</option>
+            <option value="Sports">Sports</option>
+            <option value="Media">Media</option>
+            <option value="Construction">Construction</option>
+            <option value="Hospitality">Hospitality</option>
+            <option value="Technology">Technology</option>
+            <option value="Real Estate">Real Estate</option>
+            <option value="Automotive">Automotive</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Law">Law</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input class="form-input" id="f-location" placeholder="City, State">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-select" id="f-priority">
+            <option value="high">High Priority</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Email / Contact</label>
+          <input class="form-input" id="f-email" placeholder="email@domain.com or LinkedIn URL">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Bio / Background</label>
+          <textarea class="form-textarea" id="f-bio" placeholder="Key background, net worth, achievements…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Faith Signal</label>
+          <textarea class="form-textarea" id="f-faith" placeholder="Known faith background, public statements, church affiliation…" style="min-height:70px"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">GCU Angle / Talking Points</label>
+          <textarea class="form-textarea" id="f-angle" placeholder="Why they'd care about GCU, specific connection points, ask ideas…" style="min-height:70px"></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Tags (comma-separated)</label>
+          <input class="form-input" id="f-tags" placeholder="e.g. Billionaire, Education Reform, Social Media, Arizona">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="savePerson()">Save Prospect</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let people = [
+  {
+    id: 1,
+    name: "James Dumoulin",
+    role: "Co-Founder",
+    org: "School of Hard Knocks",
+    category: "Media",
+    location: "Austin, TX",
+    email: "",
+    bio: "23-year-old Gen Z entrepreneur and co-founder of School of Hard Knocks — a media platform doing over $1M/month in revenue with 22M+ followers and 4B+ views. Built 8-figure business by interviewing billionaires on the street. Has spoken to Will Smith, Mark Cuban, Gary Vee, and Tom Cruise. Speaking fee $30K–$50K.",
+    faith: "Featured on Faith Driven Entrepreneur podcast. Content emphasis on real-world wisdom, discipline, and purpose — strong alignment with faith-based entrepreneurship circles.",
+    angle: "GCU's entrepreneurial ecosystem (Canyon Ventures) is exactly the kind of real-world, practical education environment his platform champions. Great candidate for a guest lecture, campus content shoot, or Canyon Ventures partnership. His audience is GCU's core demographic.",
+    tags: ["Gen Z", "Billionaire Network", "Social Media", "8-Figure Business"],
+    priority: "high",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 2,
+    name: "Myron Golden",
+    role: "Founder & CEO",
+    org: "Skillionaire Enterprises",
+    category: "Entrepreneur",
+    location: "Tampa, FL",
+    email: "",
+    bio: "Business coach, bestselling author, and speaker with ~$25M net worth. Overcame polio as an infant and childhood poverty to build an empire teaching Biblical wealth principles. Author of 'From the Trash Man to the Cash Man' and 'BOSS Moves.' Generates $2–3M/month. Founder of Bible Success Academy.",
+    faith: "Openly Christian — integrates Biblical principles into every aspect of his business teaching. Member of Cornerstone Baptist Church. Actively speaks at Christian entrepreneur events. One of the most well-known faith-driven business coaches in the country.",
+    angle: "Myron literally built his brand on the intersection of scripture and entrepreneurship — GCU's faith-driven Entrepreneurial Science program is a natural home for collaboration. Speaker series, guest lecture, or advisory role. His audience is aspirational entrepreneurs who'd thrive at GCU.",
+    tags: ["Biblical Business", "Author", "Coaching", "Faith Leader"],
+    priority: "high",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 3,
+    name: "Stephen Cloobeck",
+    role: "Founder & Former CEO",
+    org: "Diamond Resorts International",
+    category: "Hospitality",
+    location: "Los Angeles, CA",
+    email: "",
+    bio: "Serial entrepreneur who built Diamond Resorts International into a global empire sold to Apollo for $2.2B in 2016. Brandeis grad, former Brand USA chairman, author of 'Checking In.' Philanthropist — launched Diamond Resorts Foundation, donated $1M to Brandeis neuroscience research. Recently ran for California governor.",
+    faith: "Philanthropy-driven; supports LA Dream Center, Keep Memory Alive, Brent Shapiro Foundation, and educational initiatives. Known for hospitality as a form of service. Progressive donor background.",
+    angle: "GCU's hospitality program and his expertise in hospitality leadership are a natural match. His $1M Brandeis gift shows willingness to support university programs he believes in. CityServe angle — his service-first hospitality philosophy resonates with GCU's mission.",
+    tags: ["Hospitality", "Philanthropy", "Billion-Dollar Exit", "Education Donor"],
+    priority: "medium",
+    faith_confirmed: false,
+    flag: false
+  },
+  {
+    id: 4,
+    name: "John Morgan",
+    role: "Founder",
+    org: "Morgan & Morgan",
+    category: "Law",
+    location: "Orlando, FL",
+    email: "",
+    bio: "Founder of Morgan & Morgan, the largest personal injury law firm in the US with 1,000+ attorneys and $1B+ annual revenue. Known for 'For the People' brand. Outspoken advocate, media personality, and entrepreneurial force in the legal space. Net worth ~$800M+.",
+    faith: "Catholic background. Public figures of faith.",
+    angle: "GCU's law-adjacent programs, entrepreneurship curriculum, and workforce development story align with Morgan's 'for the people' ethos. His firm actively recruits — potential workforce pipeline conversation. Also a potential philanthropy angle around access to education.",
+    tags: ["Legal Empire", "Entrepreneur", "Media Figure", "Philanthropist"],
+    priority: "medium",
+    faith_confirmed: false,
+    flag: false
+  },
+  {
+    id: 5,
+    name: "Todd Graves",
+    role: "Founder, CEO, Fry Cook & Cashier",
+    org: "Raising Cane's Chicken Fingers",
+    category: "Entrepreneur",
+    location: "Baton Rouge, LA",
+    email: "",
+    bio: "Co-founder of Raising Cane's — $22B net worth as of 2026, ranked #46 on Forbes 400. Built from a rejected B- business plan to 900+ locations and $5.1B revenue. Worked as a boilermaker and Alaskan salmon fisherman to fund his dream. One of the most iconic founder stories in American business.",
+    faith: "Devout Christian. Publicly says: 'I believe God made me good at chicken fingers to help people.' Partnered with faith-based Faith in the Community directory. Deep Christian conviction woven into his identity and public narrative.",
+    angle: "Todd's story — ignored by professors, rejected by banks, built anyway — is exactly the GCU underdog-to-champion narrative. Perfect for Canyon Ventures inspiration, workforce education alignment ($5,250/yr tuition reimbursement at Cane's), and a compelling GCU speaker/donor candidate. His faith is the hook.",
+    tags: ["Billionaire", "Faith Leader", "Workforce Education", "Forbes 400"],
+    priority: "high",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 6,
+    name: "Mark Cuban",
+    role: "Entrepreneur & Investor",
+    org: "Shark Tank / Cost Plus Drugs / Dallas Mavericks",
+    category: "Entrepreneur",
+    location: "Dallas, TX",
+    email: "",
+    bio: "Serial entrepreneur with ~$5.7B net worth. Sold Broadcast.com to Yahoo for $5.9B, owned Dallas Mavericks (NBA champions 2011), Shark Tank investor. Founded Cost Plus Drugs to disrupt pharmacy pricing. Mark Cuban Foundation runs AI Bootcamp program for underserved youth. Vocal higher ed disruption advocate.",
+    faith: "Jewish background. Foundation focused on AI education and access. Has funded NFTE entrepreneurship education for low-income students.",
+    angle: "Cuban is one of the loudest voices for affordable, practical higher education — GCU is literally the answer to his critiques. GCU's model ($8,900/yr undergrad tuition) directly addresses what he argues higher ed needs to be. He already appeared on James Dumoulin's School of Hard Knocks — connection chain there.",
+    tags: ["Billionaire", "Shark Tank", "Ed Reform", "AI Education"],
+    priority: "high",
+    faith_confirmed: false,
+    flag: false
+  },
+  {
+    id: 7,
+    name: "Craig Jackson",
+    role: "Chairman & CEO",
+    org: "Barrett-Jackson Auction Company",
+    category: "Automotive",
+    location: "Scottsdale, AZ",
+    email: "",
+    bio: "Chairman and CEO of Barrett-Jackson — the world's premier collector car auction headquartered in Scottsdale, AZ. Net worth ~$300M. Has raised $118M+ for charities through auctions, including $9.6M at 2019 Scottsdale event alone. Took over at 35 after losing father and brother. Grew company into a media empire.",
+    faith: "Deep philanthropic commitment — auctions raise millions for American Cancer Society, National Guard Educational Foundation, Ronald McDonald House. Service-driven leadership.",
+    angle: "Phoenix/Scottsdale local — Craig is right in GCU's backyard. Barrett-Jackson's charitable model aligns with CityServe's community mission. His story of inheriting a company and growing it through adversity resonates with GCU's workforce development angle. Perfect Arizona community leader to engage.",
+    tags: ["Arizona Local", "Philanthropy", "Business Legacy", "Media Empire"],
+    priority: "high",
+    faith_confirmed: false,
+    flag: false
+  },
+  {
+    id: 8,
+    name: "Giannis Antetokounmpo",
+    role: "NBA Superstar",
+    org: "Milwaukee Bucks",
+    category: "Sports",
+    location: "Milwaukee, WI",
+    email: "",
+    bio: "'The Greek Freak' — 2x NBA MVP, 2021 NBA Champion, Heisman of the hardwood. Born to Nigerian parents in Athens, Greece. Grew up in poverty, sometimes selling items on the street. Rose from undocumented immigrant family to one of the greatest players in NBA history. Antetokounmpo Family Charitable Foundation focuses on underprivileged youth.",
+    faith: "Devout Greek Orthodox Christian. Baptized at age 18. Publicly quotes 'Walk by faith, not by sight.' Thanked God upon winning the 2019 MVP. Foundation's core value listed as 'Faith.' Regularly attends church and participates in baptisms.",
+    angle: "Giannis's story of rising from nothing through faith, family, and hard work is identical to the students GCU serves. Massive social media presence. His foundation's focus on underprivileged youth directly mirrors CityServe. A GCU partnership or campus visit would be unprecedented and high-profile.",
+    tags: ["NBA Champion", "2x MVP", "Faith Story", "Underprivileged Youth"],
+    priority: "medium",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 9,
+    name: "Marc Lore",
+    role: "Founder, Chairman & CEO",
+    org: "Wonder Group / Minnesota Timberwolves",
+    category: "Entrepreneur",
+    location: "New York, NY",
+    email: "",
+    bio: "Serial entrepreneur and NBA owner. Sold Quidsi (Diapers.com) to Amazon for $545M and Jet.com to Walmart for $3.3B. Served as Walmart eCommerce CEO. Now building Wonder (food delivery super-app, $7B+ valuation). Co-owns Minnesota Timberwolves and Lynx with Alex Rodriguez. Investor in Archer (eVTOL) and multiple startups.",
+    faith: "Driven by purpose and family. Gave up hobbies and marriage to build; now reflecting on meaning and impact in public interviews.",
+    angle: "Marc is building multiple next-gen businesses simultaneously — GCU's entrepreneurial ecosystem (Canyon Ventures) and tech curriculum are exactly the kind of practical talent pipeline he needs. His Walmart and Amazon backgrounds align with workforce development. NBA ownership is a sports angle for student engagement.",
+    tags: ["Serial Entrepreneur", "Billion-Dollar Exits", "NBA Owner", "eCommerce"],
+    priority: "medium",
+    faith_confirmed: false,
+    flag: false
+  },
+  {
+    id: 10,
+    name: "John Lee Hoich",
+    role: "Founder",
+    org: "Hoich Enterprises (Real Estate)",
+    category: "Real Estate",
+    location: "Arizona",
+    email: "jhoich@hoich.com",
+    bio: "Arizona-based real estate entrepreneur and investor. Local presence in the Phoenix market — strong potential for GCU partnership conversations around campus real estate, workforce housing, or development programs.",
+    faith: "Christian. Known as a faith-driven business leader in the Arizona entrepreneurial community.",
+    angle: "Arizona local and Christian — perfect overlap with GCU's community mission. Real estate background relevant to GCU's growing campus and CM program. Direct email available for warm outreach.",
+    tags: ["Arizona", "Real Estate", "Christian", "Local Leader"],
+    priority: "high",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 11,
+    name: "Chris Herschend",
+    role: "Board Chair & Vice Chairman",
+    org: "Herschend Family Entertainment",
+    category: "Entertainment",
+    location: "Atlanta, GA",
+    email: "",
+    bio: "Third-generation owner and board chair of Herschend Family Entertainment — the world's largest family-owned themed attractions company (Dollywood, Silver Dollar City, Harlem Globetrotters, 15M+ guests/year). Early career at Coca-Cola. MBA from Emory's Goizueta Business School. Co-founder of Elmwood Management private equity.",
+    faith: "Openly and deeply Christian. Family company was built on faith-driven values for 75+ years. Chris has spoken extensively at Faith Driven Entrepreneur events about stewardship, family legacy, and leading with purpose. Attends Passion City Church. Samaritan's Purse partner.",
+    angle: "One of the most powerful examples of faith-driven multi-generational business leadership in America. GCU's faith-based business programs, family values, and stewardship curriculum are a direct match. Guest speaker, advisory role, or scholarship fund are all natural asks.",
+    tags: ["Faith-Driven Business", "Family Legacy", "Dollywood", "Attractions"],
+    priority: "high",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 12,
+    name: "Joi Hunt",
+    role: "Founder & Business Attorney",
+    org: "The Hunt Law Group / Firm Credit & Business Group",
+    category: "Law",
+    location: "Dallas, TX",
+    email: "",
+    bio: "Serial entrepreneur and business attorney with 20+ years experience. JD from Southern University Law Center, Master's in Tax Law from SMU. Built empire across law, hair salons (Super Weave Xpress — 10 locations), automotive dealerships, and credit/funding education. 100K+ TikTok followers teaching entrepreneurs to fund and scale businesses.",
+    faith: "Christian. Faith-driven entrepreneur who openly credits her faith and resilience in rebuilding after an abusive marriage stripped her of everything.",
+    angle: "Joi's story of rebuilding from zero aligns with GCU's CityServe and community impact mission. Her practical business education work mirrors GCU's workforce development model. Strong female entrepreneur voice — relevant to GCU's diverse student programs.",
+    tags: ["Business Law", "Serial Entrepreneur", "Social Media", "Women Founders"],
+    priority: "medium",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 13,
+    name: "Simon Squibb",
+    role: "Founder",
+    org: "HelpBnk",
+    category: "Entrepreneur",
+    location: "London, UK",
+    email: "",
+    bio: "UK entrepreneur who started his first business while homeless at 15. Founded and sold 19 companies including Fluid (sold to PwC). Now runs HelpBnk — mission to help 10 million people start businesses for free. 22M+ followers across social platforms, 200M views/month. No. 1 Sunday Times bestselling author. Famously installed a doorbell on a London staircase for entrepreneurs to pitch their dreams.",
+    faith: "Openly Christian. Vocal about faith in public interviews. Strong advocate for fixing the broken higher education system — believes schools were designed to create obedient workers, not entrepreneurs. Actively campaigns to reform education legislation.",
+    angle: "Simon literally wants to fix higher education — GCU's model (affordable, faith-based, entrepreneur-focused) is the answer to his mission. Massive social media platform that reaches millions of aspiring entrepreneurs = perfect GCU ambassador or partnership. His 'Give Without Take' philosophy maps directly to CityServe.",
+    tags: ["Higher Ed Reform", "22M Followers", "Christian", "HelpBnk"],
+    priority: "high",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 14,
+    name: "Clint Phillips",
+    role: "Entrepreneur",
+    org: "Unknown",
+    category: "Entrepreneur",
+    location: "",
+    email: "",
+    bio: "Christian entrepreneur. Limited public profile — add details as you gather intel for outreach.",
+    faith: "Christian.",
+    angle: "Faith alignment with GCU's mission. Reach out to build relationship and identify specific GCU connection points.",
+    tags: ["Christian", "Entrepreneur"],
+    priority: "medium",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 15,
+    name: "Ben Pogue",
+    role: "Chairman (Former CEO)",
+    org: "Pogue Construction",
+    category: "Construction",
+    location: "McKinney, TX",
+    email: "",
+    bio: "Took over Pogue Construction from his father at age 29. Grew it from $300M to $1.5B annual revenue by 2025. Made the company employee-owned via ESOP in late 2025 ('This is our way of saying thank you'). Named former CEO Lou Morelli as new CEO while retaining Chairman role. Top 10 contractor in North Texas. Known for crisis leadership through the Allen Eagle Stadium controversy.",
+    faith: "Openly Christian. Public interviews describe how 'culture, faith, and people-first leadership' transformed the company. Strong servant-leader identity.",
+    angle: "Ben's construction background is directly relevant to GCU's Construction Management program — guest speaker, industry advisory board, or student mentorship pipeline. His people-first ESOP decision shows values alignment with GCU's workforce development mission. Faith is the cultural bridge.",
+    tags: ["Construction", "Faith Leader", "ESOP", "People-First Culture"],
+    priority: "high",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 16,
+    name: "Vic Keller",
+    role: "Founder & CEO",
+    org: "KLV Capital / Experience Ventures",
+    category: "Entrepreneur",
+    location: "Dallas, TX",
+    email: "",
+    bio: "Founded and led 14 companies generating $10B+ in enterprise value. Multiple ventures acquired by Berkshire Hathaway, making Warren Buffett a business partner. EY Entrepreneur of the Year. 5x Inc. 500 Fastest-Growing Companies. Started at JPMorgan. Now runs KLV Capital and Experience Ventures, mentoring founders and scaling high-growth companies.",
+    faith: "Values-driven leader. Faith shows up in his emphasis on integrity, authentic leadership, and serving others. Public talks reference faith alongside strategy.",
+    angle: "Vic's Berkshire connections and entrepreneurial track record make him a high-credibility advisor candidate for GCU's Canyon Ventures or business school. His EPIC Community for entrepreneurs directly mirrors what GCU is trying to build. EY recognition adds institutional credibility.",
+    tags: ["Berkshire Hathaway", "14 Companies", "EY Entrepreneur", "Mentor"],
+    priority: "medium",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 17,
+    name: "Jameis Winston",
+    role: "NFL Quarterback",
+    org: "New York Giants",
+    category: "Sports",
+    location: "New York, NY",
+    email: "",
+    bio: "NFL QB for New York Giants. #1 overall pick in 2015 NFL Draft. Heisman Trophy winner and BCS National Champion at Florida State. Led NFL in passing yards in 2019 (5,109). Career stats: 24,792 passing yards, 156 TDs. Known for resilience, faith, and public Christian testimony.",
+    faith: "One of the most openly Christian athletes in the NFL. Accepted Christ at 8, rededicated at 19, baptized at 22. Bio on X reads: '1. God 2. School (Learning Everyday) 3. Dream Forever.' Pregame: 'Unwavering faith. Ultimate belief. Dependence on the Lord.' Has spoken at Super Bowl Media Day about his faith. Actively partners with faith-based ministries.",
+    angle: "GCU's sports programs and Christian identity are a natural fit for Jameis. His '2. School (Learning Everyday)' value directly aligns with GCU's mission. Major cultural voice among young athletes. A GCU partnership or chapel/speaking event would resonate widely with the student body.",
+    tags: ["NFL QB", "Heisman Winner", "Strong Christian", "Youth Leader"],
+    priority: "high",
+    faith_confirmed: true,
+    flag: false
+  },
+  {
+    id: 18,
+    name: "Logan Roy",
+    role: "FICTIONAL CHARACTER",
+    org: "Succession (HBO)",
+    category: "Other",
+    location: "TV",
+    email: "",
+    bio: "Logan Roy is a fictional media mogul from the HBO series Succession — not a real person. Please confirm if you meant someone else (e.g. a real person with a similar name) and edit or delete this entry.",
+    faith: "N/A — fictional character.",
+    angle: "This card needs to be reviewed. Was this a placeholder, a test, or did you mean someone specific? Use the edit button to update or delete.",
+    tags: ["⚠️ Fictional Character", "Review Needed"],
+    priority: "low",
+    faith_confirmed: false,
+    flag: true
+  }
+];
+
+let editingId = null;
+
+function initials(name) {
+  return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+}
+
+function categoryBadgeClass(cat) {
+  const map = {
+    'Entrepreneur': 'entrepreneur',
+    'Sports': 'sports',
+    'Media': 'media',
+    'Construction': 'construction',
+    'Hospitality': 'hospitality',
+    'Technology': 'tech',
+    'Real Estate': 'realestate',
+    'Automotive': 'automotive',
+    'Entertainment': 'entertainment',
+    'Law': 'law',
+  };
+  return 'badge badge-' + (map[cat] || 'entrepreneur');
+}
+
+function priorityInfo(p) {
+  if (p === 'high') return { dot: 'dot-high', cls: 'priority-high', label: 'High Priority' };
+  if (p === 'medium') return { dot: 'dot-medium', cls: 'priority-medium', label: 'Medium' };
+  return { dot: 'dot-low', cls: 'priority-low', label: 'Low' };
+}
+
+function buildCard(p, idx) {
+  const pi = priorityInfo(p.priority);
+  const tagsHtml = (p.tags || []).map(t => {
+    let cls = 'tag';
+    if (t.toLowerCase().includes('christian') || t.toLowerCase().includes('faith') || t.toLowerCase().includes('biblical')) cls += ' tag-faith';
+    if (t.includes('⚠️')) cls += ' tag-hotpick';
+    return `<span class="${cls}">${t}</span>`;
+  }).join('');
+
+  if (p.flag) {
+    return `
+      <div class="flag-card" style="animation-delay:${Math.min(idx*0.04,0.6)}s">
+        <div class="flag-icon">⚠️</div>
+        <div>
+          <div class="flag-name">${p.name}</div>
+          <div class="flag-note">${p.bio}</div>
+          <div style="margin-top:10px;display:flex;gap:8px;">
+            <button class="btn-action btn-edit" onclick="openEdit(${p.id})">Edit</button>
+            <button class="btn-action btn-delete" onclick="deletePerson(${p.id})">Delete</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="card" style="animation-delay:${Math.min(idx*0.04,0.6)}s">
+      <div class="card-header">
+        <div class="avatar">${initials(p.name)}</div>
+        <div class="card-identity">
+          <div class="card-name">${p.name}</div>
+          ${p.role ? `<div class="card-role">${p.role}</div>` : ''}
+          ${p.org ? `<div class="card-org">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            ${p.org}
+          </div>` : ''}
+        </div>
+        <div class="card-badges">
+          ${p.category ? `<span class="${categoryBadgeClass(p.category)}">${p.category}</span>` : ''}
+          ${p.faith_confirmed ? `<span class="badge badge-faith">Faith ✓</span>` : ''}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-bio">${p.bio}</div>
+        ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ''}
+        <div class="card-meta">
+          ${p.faith ? `<div class="meta-row"><span class="meta-label">Faith</span><span class="meta-value">${p.faith}</span></div>` : ''}
+          ${p.angle ? `<div class="meta-row"><span class="meta-label">Angle</span><span class="meta-value">${p.angle}</span></div>` : ''}
+          ${p.location ? `<div class="meta-row"><span class="meta-label">Location</span><span class="meta-value">${p.location}</span></div>` : ''}
+          ${p.email ? `<div class="meta-row"><span class="meta-label">Contact</span><span class="meta-value"><a href="mailto:${p.email}">${p.email}</a></span></div>` : ''}
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="priority-dot ${pi.cls}">
+          <span class="dot ${pi.dot}"></span>
+          ${pi.label}
+        </div>
+        <div class="card-actions">
+          <button class="btn-action btn-edit" onclick="openEdit(${p.id})">Edit</button>
+          <button class="btn-action btn-delete" onclick="deletePerson(${p.id})">Delete</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const cat = document.getElementById('cat-filter').value;
+  const faithOnly = document.getElementById('faith-filter').value === 'faith';
+
+  const filtered = people.filter(p => {
+    const txt = [p.name, p.org, p.category, p.role, p.bio, p.location, ...(p.tags || [])].join(' ').toLowerCase();
+    if (q && !txt.includes(q)) return false;
+    if (cat && p.category !== cat) return false;
+    if (faithOnly && !p.faith_confirmed) return false;
+    return true;
+  });
+
+  const grid = document.getElementById('card-grid');
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <p>No prospects match your filters.</p>
+    </div>`;
+  } else {
+    grid.innerHTML = filtered.map((p, i) => buildCard(p, i)).join('');
+  }
+
+  document.getElementById('shown-count').textContent = filtered.length;
+  document.getElementById('total-count').textContent = people.length;
+  document.getElementById('faith-count').textContent = people.filter(p => p.faith_confirmed).length;
+  document.getElementById('count-display').textContent = filtered.length + ' prospect' + (filtered.length !== 1 ? 's' : '');
+}
+
+function populateCategories() {
+  const cats = [...new Set(people.map(p => p.category).filter(Boolean))].sort();
+  const sel = document.getElementById('cat-filter');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">All Categories</option>';
+  cats.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    if (c === current) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+function openModal(mode = 'add') {
+  document.getElementById('modal-title').textContent = mode === 'edit' ? 'EDIT PROSPECT' : 'ADD PROSPECT';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  clearForm();
+  editingId = null;
+}
+
+function clearForm() {
+  ['f-name','f-role','f-org','f-location','f-email','f-bio','f-faith','f-angle','f-tags'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-category').value = '';
+  document.getElementById('f-priority').value = 'medium';
+}
+
+function openEdit(id) {
+  const p = people.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('f-name').value = p.name || '';
+  document.getElementById('f-role').value = p.role || '';
+  document.getElementById('f-org').value = p.org || '';
+  document.getElementById('f-category').value = p.category || '';
+  document.getElementById('f-location').value = p.location || '';
+  document.getElementById('f-email').value = p.email || '';
+  document.getElementById('f-bio').value = p.bio || '';
+  document.getElementById('f-faith').value = p.faith || '';
+  document.getElementById('f-angle').value = p.angle || '';
+  document.getElementById('f-tags').value = (p.tags || []).join(', ');
+  document.getElementById('f-priority').value = p.priority || 'medium';
+  openModal('edit');
+}
+
+function savePerson() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Name is required.'); return; }
+
+  const tagsRaw = document.getElementById('f-tags').value;
+  const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+  const faith = document.getElementById('f-faith').value.trim();
+  const faithConfirmed = faith.length > 0;
+
+  const data = {
+    name,
+    role: document.getElementById('f-role').value.trim(),
+    org: document.getElementById('f-org').value.trim(),
+    category: document.getElementById('f-category').value,
+    location: document.getElementById('f-location').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    bio: document.getElementById('f-bio').value.trim(),
+    faith,
+    angle: document.getElementById('f-angle').value.trim(),
+    tags,
+    priority: document.getElementById('f-priority').value,
+    faith_confirmed: faithConfirmed,
+    flag: false
+  };
+
+  if (editingId !== null) {
+    const idx = people.findIndex(p => p.id === editingId);
+    if (idx !== -1) people[idx] = { ...people[idx], ...data };
+  } else {
+    const maxId = people.reduce((m, p) => Math.max(m, p.id), 0);
+    people.push({ id: maxId + 1, ...data });
+  }
+
+  closeModal();
+  populateCategories();
+  render();
+}
+
+function deletePerson(id) {
+  if (!confirm('Remove this prospect?')) return;
+  people = people.filter(p => p.id !== id);
+  populateCategories();
+  render();
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+populateCategories();
+render();
+</script>
+</body>
+</html>
