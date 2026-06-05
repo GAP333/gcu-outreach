@@ -271,6 +271,10 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
       <option value="">All Prospects</option>
       <option value="faith">Faith Confirmed ✓</option>
     </select>
+    <select class="list-filter" id="list-az" onchange="renderList()">
+      <option value="">All Locations</option>
+      <option value="az">🌵 Arizona Only</option>
+    </select>
   </div>
   <div class="prospect-list" id="prospect-list"></div>
 </div>
@@ -733,12 +737,14 @@ function getFilteredPeople(){
   const q = document.getElementById('list-search') ? document.getElementById('list-search').value.toLowerCase() : '';
   const cat = document.getElementById('list-cat') ? document.getElementById('list-cat').value : '';
   const faithOnly = document.getElementById('list-faith') ? document.getElementById('list-faith').value==='faith' : false;
+  const azOnly = document.getElementById('list-az') ? document.getElementById('list-az').value==='az' : false;
   return people.filter(p=>{
     if(currentFilter==='high' && p.priority!=='high') return false;
     if(currentFilter==='medium' && p.priority!=='medium') return false;
     if(currentFilter==='faith' && !p.faith_confirmed) return false;
     if(cat && p.category!==cat) return false;
     if(faithOnly && !p.faith_confirmed) return false;
+    if(azOnly){const loc=(p.location||'').toLowerCase();if(!loc.includes('az')&&!loc.includes('arizona')&&!loc.includes('scottsdale')&&!loc.includes('phoenix')&&!loc.includes('tempe')&&!loc.includes('mesa')&&!loc.includes('chandler')&&!loc.includes('gilbert')) return false;}
     const txt=[p.name,p.org,p.category,p.role,p.bio,p.location,...(p.tags||[])].join(' ').toLowerCase();
     if(q && !txt.includes(q)) return false;
     return true;
@@ -822,6 +828,9 @@ function renderList(){
   const q = document.getElementById('list-search').value.toLowerCase();
   const cat = document.getElementById('list-cat').value;
   const faithOnly = document.getElementById('list-faith').value==='faith';
+  const azOnly = document.getElementById('list-az').value==='az';
+
+  const azOnly = document.getElementById('list-az').value==='az';
 
   let filtered = people.filter(p=>{
     if(currentFilter==='high' && p.priority!=='high') return false;
@@ -829,6 +838,7 @@ function renderList(){
     if(currentFilter==='faith' && !p.faith_confirmed) return false;
     if(cat && p.category!==cat) return false;
     if(faithOnly && !p.faith_confirmed) return false;
+    if(azOnly){const loc=(p.location||'').toLowerCase();if(!loc.includes('az')&&!loc.includes('arizona')&&!loc.includes('scottsdale')&&!loc.includes('phoenix')&&!loc.includes('tempe')&&!loc.includes('mesa')&&!loc.includes('chandler')&&!loc.includes('gilbert')) return false;}
     const txt=[p.name,p.org,p.category,p.role,p.bio,p.location,...(p.tags||[])].join(' ').toLowerCase();
     if(q && !txt.includes(q)) return false;
     return true;
