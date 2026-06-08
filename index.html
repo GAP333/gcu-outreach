@@ -234,6 +234,13 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
 .tier-select.tr{background-color:#fffbeb;color:#b45309;border-color:#fde68a}
 .tier-select.tc{background-color:#f0fdf4;color:#16a34a;border-color:#bbf7d0}
 .tier-select.tu{background-color:#f3f4f6;color:#6b7280;border-color:#e5e7eb}
+
+.email-input-wrap { margin-top: 8px; }
+.email-input-wrap label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #bbb; display: block; margin-bottom: 4px; }
+.email-edit-input { width: 100%; padding: 7px 10px; border: 1.5px solid #e8e8e8; border-radius: 7px; font-size: 13px; font-family: inherit; outline: none; color: #222; transition: border-color 0.15s; }
+.email-edit-input:focus { border-color: #4f46e5; }
+.email-save-btn { margin-top: 6px; padding: 5px 14px; background: #111; color: #fff; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.email-save-btn:hover { background: #333; }
 </style>
 </head>
 <body>
@@ -375,7 +382,15 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
       </div>
       <div class="sidebar-card" id="d-contact-card">
         <div class="sidebar-card-label">CONTACT INFORMATION</div>
-        <div class="sidebar-card-text" id="d-contact"></div>
+        <div class="email-input-wrap">
+          <label>Primary Email</label>
+          <input type="email" class="email-edit-input" id="d-email1" placeholder="Enter email address..."/>
+        </div>
+        <div class="email-input-wrap">
+          <label>Secondary Email</label>
+          <input type="email" class="email-edit-input" id="d-email2" placeholder="Enter secondary email..."/>
+        </div>
+        <button class="email-save-btn" onclick="saveEmails()">Save Emails</button>
       </div>
       <div class="sidebar-card" id="d-gcu-card">
         <div class="sidebar-card-label">GCU CONNECTION</div>
@@ -975,9 +990,8 @@ function showDetail(id){
 
   document.getElementById('d-bio').textContent = p.bio||'No biography available.';
   document.getElementById('d-approach').textContent = p.approach||'No approach strategy added yet.';
-  document.getElementById('d-contact').innerHTML = p.email
-    ? `<a href="mailto:${p.email}" style="color:#4f46e5;font-weight:600;text-decoration:none">${p.email}</a><br><span style="font-size:12px;color:#888;margin-top:4px;display:block">${p.approach||''}</span>`
-    : `<span style="color:#888">No direct contact info available.</span><br><span style="font-size:12.5px;color:#333;margin-top:6px;display:block">${p.approach||'See Best Approach for recommended outreach path.'}</span>`;
+  document.getElementById('d-email1').value = p.email || '';
+  document.getElementById('d-email2').value = p.email2 || '';
   document.getElementById('d-gcu').textContent = p.angle||'No GCU connection angle added yet.';
   document.getElementById('d-faith').textContent = p.faith||'Faith background not confirmed.';
 
@@ -1137,8 +1151,25 @@ people.forEach(p => {
   if(o.tier !== undefined) p.tier = o.tier;
   if(o.status !== undefined){ p.status = o.status; p.contacted = o.status==='Contacted'||o.status==='Meeting booked'; p.meetings = o.status==='Meeting booked'?1:(p.meetings||0); }
   if(o.email !== undefined) p.email = o.email;
+  if(o.email2 !== undefined) p.email2 = o.email2;
 });
 
+
+function saveEmails(){
+  const p = people.find(x=>x.id===currentDetailId);
+  if(!p) return;
+  const email1 = document.getElementById('d-email1').value.trim();
+  const email2 = document.getElementById('d-email2').value.trim();
+  p.email = email1;
+  p.email2 = email2;
+  saveOverride(currentDetailId, 'email', email1);
+  saveOverride(currentDetailId, 'email2', email2);
+  // Flash button
+  const btn = document.querySelector('.email-save-btn');
+  btn.textContent = 'Saved!';
+  btn.style.background = '#16a34a';
+  setTimeout(()=>{ btn.textContent = 'Save Emails'; btn.style.background = '#111'; }, 1500);
+}
 function saveOverride(id, field, value){
   const overrides = getSaved('gcu_overrides', {});
   if(!overrides[id]) overrides[id] = {};
