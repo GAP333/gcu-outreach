@@ -245,7 +245,7 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
     <span class="nav-logo-text">School of Hard Knocks Pipeline</span>
   </div>
   <div class="nav-center" id="nav-stats">
-    <span>⚡ <span class="nav-dot-orange" id="nav-followup">0</span> need follow-up</span>
+    <span><span class="nav-dot-orange" id="nav-followup">0</span> need follow-up</span>
     <span><span class="nav-dot-green" id="nav-green">0</span> green · <span class="nav-dot-yellow" id="nav-yellow">0</span> yellow · <span id="nav-contacted">0</span> contacted · <span id="nav-meetings">0</span> meetings</span>
     <span class="nav-live"><span class="nav-live-dot"></span>Live sync</span>
   </div>
@@ -261,7 +261,7 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
     <div class="hero-ctas">
       <button class="cta-btn cta-green" onclick="showList('high')"><span id="cta-green-count">0</span> High Priority prospects →</button>
       <button class="cta-btn cta-yellow" onclick="showList('medium')"><span id="cta-yellow-count">0</span> Medium prospects →</button>
-      <button class="cta-btn cta-orange" onclick="showList('faith')">⚡ <span id="cta-faith-count">0</span> Faith confirmed →</button>
+      <button class="cta-btn cta-orange" onclick="showList('faith')"><span id="cta-faith-count">0</span> Faith confirmed →</button>
       <button class="cta-btn cta-outline" onclick="showList('all')">View all <span id="cta-all-count">0</span> →</button>
     </div>
   </div>
@@ -313,17 +313,17 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
     <select class="list-filter" id="list-cat" onchange="renderList()"><option value="">All Categories</option></select>
     <select class="list-filter" id="list-faith" onchange="renderList()">
       <option value="">All Prospects</option>
-      <option value="faith">Faith Confirmed ✓</option>
+      <option value="faith">Faith Confirmed</option>
     </select>
     <select class="list-filter" id="list-az" onchange="renderList()">
       <option value="">All Locations</option>
-      <option value="az">🌵 Arizona Only</option>
+      <option value="az">Arizona Only</option>
     </select>
     <select class="list-filter" id="list-tier" onchange="renderList()">
       <option value="">All Tiers</option>
-      <option value="Whale">🐋 Whale</option>
-      <option value="Review">🔍 Review</option>
-      <option value="Contact">✅ Contact</option>
+      <option value="Whale">Whale</option>
+      <option value="Review">Review</option>
+      <option value="Contact">Contact</option>
     </select>
   </div>
   <div class="prospect-list" id="prospect-list"></div>
@@ -369,19 +369,19 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
     </div>
     <div class="detail-sidebar">
       <div class="sidebar-card sidebar-card-high" id="d-approach-card">
-        <div class="sidebar-card-label">🎯 BEST APPROACH</div>
+        <div class="sidebar-card-label">BEST APPROACH</div>
         <div class="sidebar-card-text" id="d-approach"></div>
       </div>
       <div class="sidebar-card" id="d-contact-card">
-        <div class="sidebar-card-label">📞 CONTACT INFORMATION</div>
+        <div class="sidebar-card-label">CONTACT INFORMATION</div>
         <div class="sidebar-card-text" id="d-contact"></div>
       </div>
       <div class="sidebar-card" id="d-gcu-card">
-        <div class="sidebar-card-label">🎓 GCU CONNECTION</div>
+        <div class="sidebar-card-label">GCU CONNECTION</div>
         <div class="sidebar-card-text" id="d-gcu"></div>
       </div>
       <div class="sidebar-card">
-        <div class="sidebar-card-label">✦ FAITH SIGNAL</div>
+        <div class="sidebar-card-label">FAITH SIGNAL</div>
         <div class="sidebar-card-text" id="d-faith"></div>
       </div>
       <div class="sidebar-card">
@@ -580,12 +580,12 @@ let people = [
    tags:["Christian","Entrepreneur"],
    news:[]},
 
-  {id:18,tier:"Review",name:"Logan Roy",role:"⚠️ Review — May Be Fictional",org:"Unknown",category:"Other",location:"",email:"",priority:"low",faith_confirmed:false,score:0,contacted:false,meetings:0,
+  {id:18,tier:"Review",name:"Logan Roy",role:"Review — May Be Fictional",org:"Unknown",category:"Other",location:"",email:"",priority:"low",faith_confirmed:false,score:0,contacted:false,meetings:0,
    bio:"Logan Roy is a fictional media mogul from HBO's Succession. If you meant a real person with this name, please edit this card with the correct details. Otherwise, delete this entry.",
    approach:"N/A — please review and edit or delete this card.",
    faith:"N/A",
    angle:"This card needs review.",
-   tags:["⚠️ Review Needed"],
+   tags:["Review Needed"],
    news:[]},
 
   // === SCHOOL OF HARD KNOCKS NETWORK — Deep Dive Additions ===
@@ -915,7 +915,7 @@ function renderList(){
         <div class="row-sub">${[p.role,p.org].filter(Boolean).join(' · ')}</div>
       </div>
       <div class="row-right">
-        ${p.faith_confirmed?'<span class="row-faith">Faith ✓</span>':''}
+        ${p.faith_confirmed?'<span class="row-faith">Faith</span>':''}
         <span id="tier-badge-${p.id}" class="row-tier ${getTierRowClass(p.tier||'')}">${getTierLabel(p.tier||'')}</span>
         <span class="row-score ${scoreColor(p)}">${p.score||'-'}</span>
         <div class="row-actions" onclick="event.stopPropagation()">
@@ -953,7 +953,7 @@ function showDetail(id){
 
   // Badges
   const reachClass = p.priority==='high'?'badge-reach-green':'badge-reach-yellow';
-  const reachLabel = p.priority==='high'?'🟢 Reach out now':p.priority==='medium'?'🟡 High potential':'Low priority';
+  const reachLabel = p.priority==='high'?'Reach out now':p.priority==='medium'?'High potential':'Low priority';
   const statusOptions = ['Needs to be Contacted','Not contacted','Contacted','Meeting booked','Passed'];
   const currentStatus = p.status || 'Needs to be Contacted';
   const currentTier = p.tier || '';
@@ -965,7 +965,7 @@ function showDetail(id){
     </div>
     <div class="detail-badge ${reachClass}">${reachLabel}</div>
     <select id="tier-sel-${p.id}" class="tier-select ${getTierClass(currentTier)}" onchange="updateTier(${p.id}, this.value)" style="margin-top:6px">
-      ${['','Whale','Review','Contact'].map(t=>`<option value="${t}" ${t===currentTier?'selected':''}>${t?getTierLabel(t):'— Set Tier'}</option>`).join('')}
+      ${['','Whale','Review','Contact'].map(t=>`<option value="${t}" ${t===currentTier?'selected':''}>${t?getTierLabel(t):'Set Tier'}</option>`).join('')}
     </select>`;
 
   document.getElementById('d-bio').textContent = p.bio||'No biography available.';
@@ -991,10 +991,10 @@ function showDetail(id){
         <div><div class="detail-news-title">${n.title}</div><div class="detail-news-source">${n.source}</div></div>
         <div class="detail-news-date">${n.date}</div>
       </div>`).join('') +
-      `<div style="margin-top:10px"><a class="detail-news-link" href="https://news.google.com/search?q=${newsName}" target="_blank">🔍 Search Google News for ${p.name} →</a></div>`;
+      `<div style="margin-top:10px"><a class="detail-news-link" href="https://news.google.com/search?q=${newsName}" target="_blank"> Search Google News for ${p.name} →</a></div>`;
   } else {
     newsBox.innerHTML = `<div class="detail-news-empty">No recent articles found automatically.</div>
-      <a class="detail-news-link" href="https://news.google.com/search?q=${newsName}" target="_blank">🔍 Search Google News for ${p.name} →</a>`;
+      <a class="detail-news-link" href="https://news.google.com/search?q=${newsName}" target="_blank"> Search Google News for ${p.name} →</a>`;
   }
 
   window.scrollTo(0,0);
@@ -1068,10 +1068,10 @@ function getTierClass(tier){
   return 'tu';
 }
 function getTierLabel(tier){
-  if(tier==='Whale') return '🐋 Whale';
-  if(tier==='Review') return '🔍 Review';
-  if(tier==='Contact') return '✅ Contact';
-  return '— Unset';
+  if(tier==='Whale') return 'Whale';
+  if(tier==='Review') return 'Review';
+  if(tier==='Contact') return 'Contact';
+  return 'Unset';
 }
 function getTierRowClass(tier){
   if(tier==='Whale') return 'tier-whale';
