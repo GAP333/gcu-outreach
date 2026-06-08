@@ -237,10 +237,17 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
 
 .email-input-wrap { margin-top: 8px; }
 .email-input-wrap label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #bbb; display: block; margin-bottom: 4px; }
-.email-edit-input { width: 100%; padding: 7px 10px; border: 1.5px solid #e8e8e8; border-radius: 7px; font-size: 13px; font-family: inherit; outline: none; color: #222; transition: border-color 0.15s; }
+.email-edit-input { width: 100%; padding: 7px 10px; border: 1.5px solid #e8e8e8; border-radius: 7px; font-size: 13px; font-family: inherit; outline: none; color: #222; transition: all 0.2s; background: #fff; }
 .email-edit-input:focus { border-color: #4f46e5; }
-.email-save-btn { margin-top: 6px; padding: 5px 14px; background: #111; color: #fff; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.email-edit-input.locked { border-color: #bbf7d0; background: #f0fdf4; color: #15803d; font-weight: 600; cursor: default; pointer-events: none; }
+.email-locked-display { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1.5px solid #bbf7d0; border-radius: 7px; background: #f0fdf4; cursor: default; }
+.email-locked-display .email-val { font-size: 13px; font-weight: 600; color: #15803d; flex: 1; }
+.email-locked-display .email-lock-icon { font-size: 11px; color: #16a34a; flex-shrink: 0; }
+.email-locked-display .email-hint { font-size: 10px; color: #86efac; flex-shrink: 0; }
+.email-edit-input.unlocked { border-color: #fde68a; background: #fffbeb; color: #92400e; }
+.email-save-btn { margin-top: 8px; padding: 6px 16px; background: #111; color: #fff; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; }
 .email-save-btn:hover { background: #333; }
+.email-save-btn.saved { background: #16a34a; }
 </style>
 </head>
 <body>
@@ -384,13 +391,23 @@ footer{text-align:center;padding:20px;font-size:12px;color:#bbb;border-top:1px s
         <div class="sidebar-card-label">CONTACT INFORMATION</div>
         <div class="email-input-wrap">
           <label>Primary Email</label>
+          <div id="d-email1-display" class="email-locked-display" style="display:none" ondblclick="unlockEmail(1)">
+            <span class="email-lock-icon">&#9679;</span>
+            <span class="email-val" id="d-email1-val"></span>
+            <span class="email-hint">double-click to edit</span>
+          </div>
           <input type="email" class="email-edit-input" id="d-email1" placeholder="Enter email address..."/>
         </div>
         <div class="email-input-wrap">
           <label>Secondary Email</label>
+          <div id="d-email2-display" class="email-locked-display" style="display:none" ondblclick="unlockEmail(2)">
+            <span class="email-lock-icon">&#9679;</span>
+            <span class="email-val" id="d-email2-val"></span>
+            <span class="email-hint">double-click to edit</span>
+          </div>
           <input type="email" class="email-edit-input" id="d-email2" placeholder="Enter secondary email..."/>
         </div>
-        <button class="email-save-btn" onclick="saveEmails()">Save Emails</button>
+        <button class="email-save-btn" id="email-save-btn" onclick="saveEmails()">Save Emails</button>
       </div>
       <div class="sidebar-card" id="d-gcu-card">
         <div class="sidebar-card-label">GCU CONNECTION</div>
@@ -990,8 +1007,8 @@ function showDetail(id){
 
   document.getElementById('d-bio').textContent = p.bio||'No biography available.';
   document.getElementById('d-approach').textContent = p.approach||'No approach strategy added yet.';
-  document.getElementById('d-email1').value = p.email || '';
-  document.getElementById('d-email2').value = p.email2 || '';
+  setEmailField(1, p.email || '');
+  setEmailField(2, p.email2 || '');
   document.getElementById('d-gcu').textContent = p.angle||'No GCU connection angle added yet.';
   document.getElementById('d-faith').textContent = p.faith||'Faith background not confirmed.';
 
@@ -1155,6 +1172,32 @@ people.forEach(p => {
 });
 
 
+function setEmailField(num, val){
+  const input = document.getElementById('d-email'+num);
+  const display = document.getElementById('d-email'+num+'-display');
+  const valSpan = document.getElementById('d-email'+num+'-val');
+  if(val){
+    input.style.display = 'none';
+    display.style.display = 'flex';
+    valSpan.textContent = val;
+    input.value = val;
+  } else {
+    input.style.display = 'block';
+    display.style.display = 'none';
+    input.value = '';
+  }
+}
+
+function unlockEmail(num){
+  const input = document.getElementById('d-email'+num);
+  const display = document.getElementById('d-email'+num+'-display');
+  display.style.display = 'none';
+  input.style.display = 'block';
+  input.classList.add('unlocked');
+  input.focus();
+  input.select();
+}
+
 function saveEmails(){
   const p = people.find(x=>x.id===currentDetailId);
   if(!p) return;
@@ -1164,11 +1207,16 @@ function saveEmails(){
   p.email2 = email2;
   saveOverride(currentDetailId, 'email', email1);
   saveOverride(currentDetailId, 'email2', email2);
+  // Lock fields
+  setEmailField(1, email1);
+  setEmailField(2, email2);
+  document.getElementById('d-email1').classList.remove('unlocked');
+  document.getElementById('d-email2').classList.remove('unlocked');
   // Flash button
-  const btn = document.querySelector('.email-save-btn');
+  const btn = document.getElementById('email-save-btn');
   btn.textContent = 'Saved!';
-  btn.style.background = '#16a34a';
-  setTimeout(()=>{ btn.textContent = 'Save Emails'; btn.style.background = '#111'; }, 1500);
+  btn.classList.add('saved');
+  setTimeout(()=>{ btn.textContent = 'Save Emails'; btn.classList.remove('saved'); }, 2000);
 }
 function saveOverride(id, field, value){
   const overrides = getSaved('gcu_overrides', {});
