@@ -1089,6 +1089,7 @@ function updateTier(id, tier){
   const p = people.find(x=>x.id===id);
   if(!p) return;
   p.tier = tier;
+  saveOverride(id, 'tier', tier);
   // Update the select styling live
   const sel = document.getElementById('tier-sel-'+id);
   if(sel){ sel.className = 'tier-select ' + getTierClass(tier); }
@@ -1103,17 +1104,47 @@ function updateStatus(id, status){
   p.status = status;
   p.contacted = status==='Contacted' || status==='Meeting booked';
   p.meetings = status==='Meeting booked' ? 1 : (p.meetings||0);
+  saveOverride(id, 'status', status);
   updateStats();
 }
 
 function deletePerson(id){
   if(!confirm('Remove this prospect?')) return;
   people=people.filter(p=>p.id!==id);
+  // Persist deletion
+  const deleted = getSaved('gcu_deleted', []);
+  if(!deleted.includes(id)) deleted.push(id);
+  setSaved('gcu_deleted', deleted);
   populateCatFilter(); renderList(); updateStats();
 }
 
 document.getElementById('form-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeForm();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeForm();});
+
+// ── PERSISTENCE ─────────────────────────────────────────────────────────────
+function getSaved(key, fallback){ try{ const v=localStorage.getItem(key); return v!==null?JSON.parse(v):fallback; }catch(e){ return fallback; } }
+function setSaved(key, val){ try{ localStorage.setItem(key,JSON.stringify(val)); }catch(e){} }
+
+// Apply saved deletions
+const deletedIds = getSaved('gcu_deleted', []);
+people = people.filter(p => !deletedIds.includes(p.id));
+
+// Apply saved tier/status/email overrides
+const overrides = getSaved('gcu_overrides', {});
+people.forEach(p => {
+  const o = overrides[p.id];
+  if(!o) return;
+  if(o.tier !== undefined) p.tier = o.tier;
+  if(o.status !== undefined){ p.status = o.status; p.contacted = o.status==='Contacted'||o.status==='Meeting booked'; p.meetings = o.status==='Meeting booked'?1:(p.meetings||0); }
+  if(o.email !== undefined) p.email = o.email;
+});
+
+function saveOverride(id, field, value){
+  const overrides = getSaved('gcu_overrides', {});
+  if(!overrides[id]) overrides[id] = {};
+  overrides[id][field] = value;
+  setSaved('gcu_overrides', overrides);
+}
 
 updateStats();
 </script>
