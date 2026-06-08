@@ -790,6 +790,7 @@ function getFilteredPeople(){
   const faithOnly = document.getElementById('list-faith') ? document.getElementById('list-faith').value==='faith' : false;
   const azOnly = document.getElementById('list-az') ? document.getElementById('list-az').value==='az' : false;
   const tierFilter = document.getElementById('list-tier') ? document.getElementById('list-tier').value : '';
+  const emailSearch = document.getElementById('email-search') ? document.getElementById('email-search').value.toLowerCase().trim() : '';
   return people.filter(p=>{
     if(currentFilter==='high' && p.priority!=='high') return false;
     if(currentFilter==='medium' && p.priority!=='medium') return false;
