@@ -1111,9 +1111,10 @@ function updateStatus(id, status){
 function deletePerson(id){
   if(!confirm('Remove this prospect?')) return;
   people=people.filter(p=>p.id!==id);
-  // Persist deletion
+  // Persist deletion — store as strings to avoid type mismatch on reload
   const deleted = getSaved('gcu_deleted', []);
-  if(!deleted.includes(id)) deleted.push(id);
+  const sid = String(id);
+  if(!deleted.includes(sid)) deleted.push(sid);
   setSaved('gcu_deleted', deleted);
   populateCatFilter(); renderList(); updateStats();
 }
@@ -1126,8 +1127,8 @@ function getSaved(key, fallback){ try{ const v=localStorage.getItem(key); return
 function setSaved(key, val){ try{ localStorage.setItem(key,JSON.stringify(val)); }catch(e){} }
 
 // Apply saved deletions
-const deletedIds = getSaved('gcu_deleted', []);
-people = people.filter(p => !deletedIds.includes(p.id));
+const deletedIds = getSaved('gcu_deleted', []).map(String);
+people = people.filter(p => !deletedIds.includes(String(p.id)));
 
 // Apply saved tier/status/email overrides
 const overrides = getSaved('gcu_overrides', {});
