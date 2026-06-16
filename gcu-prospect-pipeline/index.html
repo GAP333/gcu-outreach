@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GCU Prospect Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- Shown if config.js hasn't been connected to a Supabase project yet -->
+<div id="connection-banner" class="connection-banner" style="display:none">
+  Not connected to a database yet — changes won't save or sync. See README.md to finish setup.
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo" onclick="showHero()">
+    <div class="nav-logo-box">GCU</div>
+    <span class="nav-logo-text" id="nav-logo-text">Prospect Pipeline</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab" id="tab-SOHK" onclick="switchList('SOHK')">School of Hard Knocks</button>
+    <button class="nav-tab" id="tab-KIC" onclick="switchList('KIC')">Kingdom Impact Council</button>
+  </div>
+  <div class="nav-center" id="nav-stats">
+    <span><span class="nav-dot-orange" id="nav-followup">0</span> need follow-up</span>
+    <span><span class="nav-dot-green" id="nav-green">0</span> green · <span class="nav-dot-yellow" id="nav-yellow">0</span> yellow · <span id="nav-contacted">0</span> contacted · <span id="nav-meetings">0</span> meetings</span>
+    <span class="nav-live"><span class="nav-live-dot" id="nav-live-dot"></span><span id="nav-live-label">Connecting…</span></span>
+  </div>
+  <button class="btn-view-prospects" onclick="showList('all')">View prospects →</button>
+</nav>
+
+<!-- HERO PAGE -->
+<div id="page-hero">
+  <div class="hero">
+    <div class="hero-label" id="hero-label">SOHK Prospect Pipeline · Grand Canyon University</div>
+    <div class="hero-title" id="hero-title">School of Hard Knocks<br>Pipeline.</div>
+    <div class="hero-sub" id="hero-sub">Loading prospects researched and scored for GCU outreach.</div>
+    <div class="hero-ctas">
+      <button class="cta-btn cta-green" onclick="showList('high')"><span id="cta-green-count">0</span> High Priority prospects →</button>
+      <button class="cta-btn cta-yellow" onclick="showList('medium')"><span id="cta-yellow-count">0</span> Medium prospects →</button>
+      <button class="cta-btn cta-orange" onclick="showList('faith')"><span id="cta-faith-count">0</span> Faith confirmed →</button>
+      <button class="cta-btn cta-outline" onclick="showList('all')">View all <span id="cta-all-count">0</span> →</button>
+    </div>
+  </div>
+  <div class="stat-bar">
+    <div class="stat-bar-inner">
+      <div class="stat-tile">
+        <div class="stat-num" id="st-high">0</div>
+        <div class="stat-name">High Priority</div>
+        <div class="stat-desc">Reach out now</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num" id="st-medium">0</div>
+        <div class="stat-name">Medium</div>
+        <div class="stat-desc">High potential</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num" id="st-faith">0</div>
+        <div class="stat-name">Faith Confirmed</div>
+        <div class="stat-desc">Known Christians</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num" id="st-contacted">0</div>
+        <div class="stat-name">Contacted</div>
+        <div class="stat-desc">In progress</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num" id="st-meetings">0</div>
+        <div class="stat-name">Meetings</div>
+        <div class="stat-desc">Logged</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIST VIEW -->
+<div class="list-view" id="page-list">
+  <div class="list-header">
+    <div>
+      <button class="list-back" onclick="showHero()">← Back</button>
+      <div class="list-title-row" style="margin-top:8px">
+        <div class="list-title" id="list-title">All Prospects</div>
+        <span class="list-count-badge badge-all" id="list-badge">0</span>
+      </div>
+    </div>
+    <button class="add-btn" onclick="openForm()">+ Add Prospect</button>
+  </div>
+  <div class="list-controls">
+    <input class="list-search" id="list-search" placeholder="Search name, company, category…" oninput="renderList()">
+    <select class="list-filter" id="list-cat" onchange="renderList()"><option value="">All Categories</option></select>
+    <select class="list-filter" id="list-faith" onchange="renderList()">
+      <option value="">All Prospects</option>
+      <option value="faith">Faith Confirmed</option>
+    </select>
+    <select class="list-filter" id="list-az" onchange="renderList()">
+      <option value="">All Locations</option>
+      <option value="az">Arizona Only</option>
+    </select>
+    <select class="list-filter" id="list-tier" onchange="renderList()">
+      <option value="">All Tiers</option>
+      <option value="Whale">Whale</option>
+      <option value="Review">Review</option>
+      <option value="Contact">Contact</option>
+    </select>
+    <select class="list-filter" id="list-stage" onchange="renderList()">
+      <option value="">All Stages</option>
+      <option value="none">Not Started</option>
+      <option value="Emailed">Emailed</option>
+      <option value="Interested">Interested</option>
+      <option value="Met with">Met with</option>
+      <option value="Confirmed">Confirmed</option>
+    </select>
+    <select class="list-filter" id="list-followup" onchange="renderList()">
+      <option value="">All</option>
+      <option value="followup">Needs Follow-up</option>
+    </select>
+    <input type="text" id="email-search" class="list-filter" placeholder="Search by email..." oninput="renderList()" style="width:160px"/>
+  </div>
+  <div class="prospect-list" id="prospect-list"></div>
+</div>
+
+<!-- DETAIL VIEW -->
+<div class="detail-view" id="page-detail">
+  <button class="detail-back" id="detail-back-btn" onclick="showList()">← Back to prospects</button>
+  <div class="detail-nav">
+    <div>
+      <div class="detail-name" id="d-name"></div>
+      <div class="detail-role" id="d-role"></div>
+      <div class="detail-org" id="d-org"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+      <div class="detail-progress-wrap">
+        <span id="d-score-label"></span>
+        <div class="detail-progress-bar"><div class="detail-progress-fill" id="d-progress"></div></div>
+        <span>out of 100</span>
+      </div>
+      <div class="detail-nav-arrows">
+        <button class="arrow-btn" id="btn-prev" onclick="navigateDetail(-1)">← Prev</button>
+        <span class="arrow-counter" id="d-counter"></span>
+        <button class="arrow-btn" id="btn-next" onclick="navigateDetail(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+  <div class="detail-badges" id="d-badges"></div>
+  <div class="detail-body">
+    <div class="detail-main">
+      <div>
+        <div class="detail-notable" id="d-notable" style="display:none"></div>
+        <div class="detail-section-label">BIOGRAPHY</div>
+        <div class="detail-bio" id="d-bio"></div>
+      </div>
+
+      <div>
+        <div class="detail-section-label">TOUCHPOINTS</div>
+        <div class="touchpoint-last" id="d-touchpoints-last"></div>
+        <div class="touchpoint-list" id="d-touchpoints-list"></div>
+        <div class="touchpoint-form">
+          <select id="tp-type" class="touchpoint-select">
+            <option>Email</option><option>Call</option><option>Meeting</option><option>Text</option><option>Other</option>
+          </select>
+          <input type="date" id="tp-date" class="touchpoint-date"/>
+          <input type="text" id="tp-logged-by" class="touchpoint-name" placeholder="Logged by…"/>
+          <textarea id="tp-note" class="touchpoint-note-input" placeholder="What happened? (optional)"></textarea>
+          <button class="touchpoint-add-btn" onclick="addTouchpoint()">+ Log Touchpoint</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="detail-section-label">RECENT NEWS</div>
+        <div class="detail-news-box" id="d-news"></div>
+      </div>
+      <div id="d-verified-wrap" style="display:none">
+        <div class="detail-section-label">VERIFIED SOURCES & ARTICLES</div>
+        <div class="detail-verified-box" id="d-verified"></div>
+      </div>
+    </div>
+    <div class="detail-sidebar">
+      <div class="sidebar-card sidebar-card-high" id="d-approach-card">
+        <div class="sidebar-card-label">BEST APPROACH</div>
+        <div class="sidebar-card-text" id="d-approach"></div>
+      </div>
+      <div class="sidebar-card" id="d-draftemail-card" style="display:none">
+        <div class="sidebar-card-label">DRAFT EMAIL</div>
+        <div class="sidebar-card-text" id="d-draftemail" style="white-space:pre-wrap"></div>
+        <button class="email-save-btn" id="d-draftemail-copy" onclick="copyDraftEmail()">Copy Draft</button>
+      </div>
+      <div class="sidebar-card" id="d-contact-card">
+        <div class="sidebar-card-label">CONTACT INFORMATION</div>
+        <div class="email-input-wrap">
+          <label>Primary Email</label>
+          <div id="d-email1-display" class="email-locked-display" style="display:none" ondblclick="unlockEmail(1)">
+            <span class="email-lock-icon">&#9679;</span>
+            <span class="email-val" id="d-email1-val"></span>
+            <span class="email-hint">double-click to edit</span>
+          </div>
+          <input type="email" class="email-edit-input" id="d-email1" placeholder="Enter email address..."/>
+        </div>
+        <div class="email-input-wrap">
+          <label>Secondary Email</label>
+          <div id="d-email2-display" class="email-locked-display" style="display:none" ondblclick="unlockEmail(2)">
+            <span class="email-lock-icon">&#9679;</span>
+            <span class="email-val" id="d-email2-val"></span>
+            <span class="email-hint">double-click to edit</span>
+          </div>
+          <input type="email" class="email-edit-input" id="d-email2" placeholder="Enter secondary email..."/>
+        </div>
+        <button class="email-save-btn" id="email-save-btn" onclick="saveEmails()">Save Emails</button>
+      </div>
+      <div class="sidebar-card" id="d-gcu-card">
+        <div class="sidebar-card-label">GCU CONNECTION</div>
+        <div class="sidebar-card-text" id="d-gcu"></div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-card-label">FAITH SIGNAL</div>
+        <div class="sidebar-card-text" id="d-faith"></div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-card-label">TAGS</div>
+        <div class="sidebar-tags" id="d-tags"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM MODAL -->
+<div class="form-overlay" id="form-overlay">
+  <div class="form-modal">
+    <div class="form-modal-header">
+      <span class="form-modal-title" id="form-title">Add Prospect</span>
+      <button class="form-modal-close" onclick="closeForm()">×</button>
+    </div>
+    <div class="form-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Name *</label><input class="form-input" id="f-name" placeholder="Full name"></div>
+        <div class="form-group"><label class="form-label">Role / Title</label><input class="form-input" id="f-role" placeholder="CEO, Founder…"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Company / Org</label><input class="form-input" id="f-org" placeholder="Organization"></div>
+        <div class="form-group"><label class="form-label">Category</label>
+          <input class="form-input" id="f-category" list="category-suggestions" placeholder="e.g. Entrepreneur, Faith Leader…">
+          <datalist id="category-suggestions"></datalist>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="f-location" placeholder="City, State"></div>
+        <div class="form-group"><label class="form-label">Priority</label>
+          <select class="form-select" id="f-priority">
+            <option value="high">High Priority</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group full"><label class="form-label">Email / Contact</label><input class="form-input" id="f-email" placeholder="email@domain.com"></div>
+      <div class="form-group full"><label class="form-label">Biography</label><textarea class="form-textarea" id="f-bio" placeholder="Background, achievements, net worth…"></textarea></div>
+      <div class="form-group full"><label class="form-label">Best Approach</label><textarea class="form-textarea" id="f-approach" placeholder="How to reach them, warmest intro path…"></textarea></div>
+      <div class="form-group full"><label class="form-label">Faith Signal</label><textarea class="form-textarea" id="f-faith" placeholder="Known faith background, church, public statements…" style="min-height:60px"></textarea></div>
+      <div class="form-group full"><label class="form-label">GCU Connection / Angle</label><textarea class="form-textarea" id="f-angle" placeholder="Why they'd care about GCU…" style="min-height:60px"></textarea></div>
+      <div class="form-group full"><label class="form-label">Tags (comma-separated)</label><input class="form-input" id="f-tags" placeholder="e.g. Billionaire, Arizona, Faith Leader"></div>
+    </div>
+    <div class="form-footer">
+      <button class="btn-cancel" onclick="closeForm()">Cancel</button>
+      <button class="btn-save" onclick="savePerson()">Save Prospect</button>
+    </div>
+  </div>
+</div>
+
+<footer>Grand Canyon University · Prospect Intelligence · School of Hard Knocks &amp; Kingdom Impact Council</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
