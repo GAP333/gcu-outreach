@@ -183,8 +183,8 @@ function showList(filter) {
   document.getElementById('page-list').classList.add('active');
   document.getElementById('page-detail').classList.remove('active');
 
-  const titles = { high: 'High Priority Prospects', medium: 'Medium Prospects', faith: 'Faith Confirmed Prospects', all: 'All Prospects' };
-  const badgeClasses = { high: 'badge-green', medium: 'badge-yellow', faith: 'badge-all', all: 'badge-all' };
+  const titles = { high: 'High Priority Prospects', medium: 'Medium Prospects', faith: 'Faith Confirmed Prospects', needscontact: 'Needs to be Contacted', contacted: 'Contacted Prospects', all: 'All Prospects' };
+  const badgeClasses = { high: 'badge-green', medium: 'badge-yellow', faith: 'badge-all', needscontact: 'badge-all', contacted: 'badge-all', all: 'badge-all' };
   document.getElementById('list-title').textContent = titles[filter] || 'All Prospects';
 
   populateCatFilter();
@@ -222,7 +222,8 @@ function getFilteredPeople() {
     if (currentFilter === 'high' && p.priority !== 'high') return false;
     if (currentFilter === 'medium' && p.priority !== 'medium') return false;
     if (currentFilter === 'faith' && !p.faith_confirmed) return false;
-    if (currentFilter === 'contacted' && !p.stage) return false;
+    if (currentFilter === 'needscontact' && p.stage !== 'Needs to be Contacted') return false;
+    if (currentFilter === 'contacted' && !(p.stage && p.stage !== 'Needs to be Contacted')) return false;
     if (sourceFilter && p.list !== sourceFilter) return false;
     if (cat && p.category !== cat) return false;
     if (faithOnly && !p.faith_confirmed) return false;
@@ -705,7 +706,8 @@ function updateStats() {
   const high = scoped.filter(p => p.priority === 'high').length;
   const medium = scoped.filter(p => p.priority === 'medium').length;
   const faith = scoped.filter(p => p.faith_confirmed).length;
-  const contacted = scoped.filter(p => p.stage).length;
+  const needsContact = scoped.filter(p => p.stage === 'Needs to be Contacted').length;
+  const contacted = scoped.filter(p => p.stage && p.stage !== 'Needs to be Contacted').length;
   const meetings = Object.values(touchpointsByProspect).reduce((sum, list) => sum + list.filter(t => t.type === 'Meeting').length, 0);
   const followup = scoped.filter(needsFollowup).length;
 
@@ -719,6 +721,7 @@ function updateStats() {
   setText('cta-green-count', high);
   setText('cta-yellow-count', medium);
   setText('cta-faith-count', faith);
+  setText('cta-needed-count', needsContact);
   setText('cta-contacted-count', contacted);
   setText('cta-all-count', scoped.length);
 
