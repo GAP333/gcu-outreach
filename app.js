@@ -12,68 +12,44 @@ import { getSupabase, isConfigured } from './config.js';
 
 // ── STATE ────────────────────────────────────────────────────────────────
 let supabase = null;
-let people = [];                 // cached prospects, refreshed from Supabase
+let people = [];                 // cached prospects (both lists combined), refreshed from Supabase
 let touchpointsByProspect = {};  // { [prospect_id]: [touchpoint, ...] } newest first
+let goals = [];                  // cached goals/KPIs, refreshed from Supabase
 
-let activeList = localStorage.getItem('gcu_active_list') || 'SOHK'; // 'SOHK' | 'KIC'
-let currentFilter = 'all';       // hero CTA filter: all | high | medium | faith
+let currentSection = 'prospects'; // 'prospects' | 'goals'
+let currentFilter = 'all';       // hero CTA filter: all | high | medium | faith | contacted
 let lastListFilter = 'all';
 let editingId = null;
 let currentDetailId = null;
 let filteredPeopleCache = [];
 
 const FOLLOWUP_DAYS = 14;                       // flag as "needs follow-up" after this many days of silence
-const STAGE_OPTIONS = ['Emailed', 'Interested', 'Met with', 'Confirmed'];
-const ENGAGED_STAGES = ['Emailed', 'Interested', 'Met with']; // "Confirmed" = done, no follow-up needed
+const STAGE_OPTIONS = ['Needs to be Contacted', 'Emailed', 'Interested', 'Met with', 'Confirmed'];
+const ENGAGED_STAGES = ['Needs to be Contacted', 'Emailed', 'Interested', 'Met with']; // "Confirmed" = done, no follow-up needed
 const TOUCHPOINT_TYPES = ['Email', 'Call', 'Meeting', 'Text', 'Other'];
+const LIST_LABELS = { SOHK: 'School of Hard Knocks', KIC: 'Kingdom Impact Council' };
 
-const BRANDING = {
-  SOHK: {
-    logoText: 'School of Hard Knocks',
-    heroLabel: 'SOHK Prospect Pipeline · Grand Canyon University',
-    heroTitle: 'School of Hard Knocks<br>Pipeline.'
-  },
-  KIC: {
-    logoText: 'Kingdom Impact Council',
-    heroLabel: 'Kingdom Impact Council · Grand Canyon University',
-    heroTitle: 'Kingdom Impact<br>Council.'
+// ── SECTION SWITCHING (Prospects <-> Goals) ─────────────────────────────────
+function showSection(section) {
+  currentSection = section;
+  document.getElementById('tab-prospects').classList.toggle('nav-tab-active', section === 'prospects');
+  document.getElementById('tab-goals').classList.toggle('nav-tab-active', section === 'goals');
+
+  if (section === 'goals') {
+    document.getElementById('page-hero').style.display = 'none';
+    document.getElementById('page-list').classList.remove('active');
+    document.getElementById('page-detail').classList.remove('active');
+    document.getElementById('page-goals').style.display = '';
+    renderGoals();
+  } else {
+    document.getElementById('page-goals').style.display = 'none';
+    showHero();
   }
-};
-
-// ── LIST SWITCHING (SOHK <-> KIC) ───────────────────────────────────────────
-function switchList(list) {
-  if (list === activeList) return;
-  activeList = list;
-  localStorage.setItem('gcu_active_list', list);
-  currentFilter = 'all';
-  lastListFilter = 'all';
-  // Clear filters so stale state from the other list's data doesn't carry over
-  ['list-search', 'email-search'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  ['list-cat', 'list-faith', 'list-az', 'list-tier', 'list-stage', 'list-followup'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  applyBranding();
-  populateCatFilter();
-  updateStats();
-  showHero();
 }
-
-function applyBranding() {
-  const b = BRANDING[activeList];
-  setText('nav-logo-text', b.logoText);
-  setText('hero-label', b.heroLabel);
-  const titleEl = document.getElementById('hero-title');
-  if (titleEl) titleEl.innerHTML = b.heroTitle;
-  document.title = b.logoText + ' · GCU Prospect Pipeline';
-  ['SOHK', 'KIC'].forEach(l => {
-    const tab = document.getElementById('tab-' + l);
-    if (tab) tab.classList.toggle('nav-tab-active', l === activeList);
-  });
-}
-
-function peopleInActiveList() { return people.filter(p => p.list === activeList); }
 
 // ── INIT ─────────────────────────────────────────────────────────────────
 async function init() {
-  applyBranding();
+  document.getElementById('tab-prospects').classList.add('nav-tab-active');
   if (!isConfigured) {
     showConnectionBanner();
     updateStats();
@@ -89,7 +65,7 @@ async function init() {
 }
 
 async function reloadAll() {
-  await Promise.all([reloadProspects(), reloadTouchpoints()]);
+  await Promise.all([reloadProspects(), reloadTouchpoints(), reloadGoals()]);
   populateCatFilter();
   renderCurrentView();
   updateStats();
@@ -111,6 +87,12 @@ async function reloadTouchpoints() {
   });
 }
 
+async function reloadGoals() {
+  const { data, error } = await supabase.from('goals').select('*').order('due_date', { ascending: true, nullsFirst: false }).order('created_at', { ascending: true });
+  if (error) { console.error('Failed to load goals:', error); return; }
+  goals = data || [];
+}
+
 function subscribeRealtime() {
   supabase
     .channel('prospects-live')
@@ -130,9 +112,18 @@ function subscribeRealtime() {
       updateStats();
     })
     .subscribe();
+
+  supabase
+    .channel('goals-live')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, async () => {
+      await reloadGoals();
+      if (currentSection === 'goals') renderGoals();
+    })
+    .subscribe();
 }
 
 function renderCurrentView() {
+  if (currentSection === 'goals') { renderGoals(); return; }
   const detailVisible = document.getElementById('page-detail').classList.contains('active');
   const listVisible = document.getElementById('page-list').classList.contains('active');
   if (detailVisible && currentDetailId != null && people.find(p => p.id === currentDetailId)) {
@@ -202,7 +193,7 @@ function showList(filter) {
 }
 
 function populateCatFilter() {
-  const cats = [...new Set(peopleInActiveList().map(p => p.category).filter(Boolean))].sort();
+  const cats = [...new Set(people.map(p => p.category).filter(Boolean))].sort();
 
   const sel = document.getElementById('list-cat');
   if (sel) {
@@ -224,12 +215,15 @@ function getFilteredPeople() {
   const tierFilter = document.getElementById('list-tier') ? document.getElementById('list-tier').value : '';
   const stageFilter = document.getElementById('list-stage') ? document.getElementById('list-stage').value : '';
   const followupOnly = document.getElementById('list-followup') ? document.getElementById('list-followup').value === 'followup' : false;
+  const sourceFilter = document.getElementById('list-source') ? document.getElementById('list-source').value : '';
   const emailSearch = document.getElementById('email-search') ? document.getElementById('email-search').value.toLowerCase().trim() : '';
 
-  return peopleInActiveList().filter(p => {
+  return people.filter(p => {
     if (currentFilter === 'high' && p.priority !== 'high') return false;
     if (currentFilter === 'medium' && p.priority !== 'medium') return false;
     if (currentFilter === 'faith' && !p.faith_confirmed) return false;
+    if (currentFilter === 'contacted' && !p.stage) return false;
+    if (sourceFilter && p.list !== sourceFilter) return false;
     if (cat && p.category !== cat) return false;
     if (faithOnly && !p.faith_confirmed) return false;
     if (tierFilter && (p.tier || '') !== tierFilter) return false;
@@ -335,6 +329,14 @@ function showDetail(id) {
   const notableEl = document.getElementById('d-notable');
   if (p.notable) { notableEl.style.display = ''; notableEl.textContent = p.notable; }
   else { notableEl.style.display = 'none'; }
+
+  const originNotes = [];
+  if (p.list) originNotes.push(`<span class="origin-note origin-${p.list}">From: ${LIST_LABELS[p.list] || p.list}</span>`);
+  if (p.manually_added) originNotes.push('<span class="origin-note origin-added">✚ Manually added prospect</span>');
+  document.getElementById('d-origin-notes').innerHTML = originNotes.join('');
+
+  const faithCheck = document.getElementById('d-faith-confirmed-check');
+  if (faithCheck) faithCheck.checked = !!p.faith_confirmed;
 
   const draftCard = document.getElementById('d-draftemail-card');
   if (p.draft_email) { draftCard.style.display = ''; document.getElementById('d-draftemail').textContent = p.draft_email; }
@@ -473,6 +475,17 @@ async function updateStage(id, stage) {
   showDetail(id);
 }
 
+async function toggleFaithConfirmed(checked) {
+  if (!requireConnection()) return;
+  const id = currentDetailId;
+  const p = people.find(x => x.id === id);
+  if (!p) return;
+  p.faith_confirmed = checked; // optimistic
+  updateStats();
+  const { error } = await supabase.from('prospects').update({ faith_confirmed: checked }).eq('id', id);
+  if (error) console.error('toggleFaithConfirmed failed:', error);
+}
+
 function setEmailField(num, val) {
   const input = document.getElementById('d-email' + num);
   const display = document.getElementById('d-email' + num + '-display');
@@ -555,6 +568,7 @@ function openEdit(id) {
   document.getElementById('f-angle').value = p.angle || '';
   document.getElementById('f-tags').value = (p.tags || []).join(', ');
   document.getElementById('f-priority').value = p.priority || 'medium';
+  document.getElementById('f-list').value = p.list || 'SOHK';
   document.getElementById('form-title').textContent = 'Edit Prospect';
   document.getElementById('form-overlay').classList.add('open');
 }
@@ -568,6 +582,7 @@ function clearForm() {
   ['f-name', 'f-role', 'f-org', 'f-location', 'f-email', 'f-bio', 'f-approach', 'f-faith', 'f-angle', 'f-tags'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('f-category').value = '';
   document.getElementById('f-priority').value = 'medium';
+  document.getElementById('f-list').value = 'SOHK';
 }
 
 async function savePerson() {
@@ -582,7 +597,7 @@ async function savePerson() {
     category: document.getElementById('f-category').value || null, location: document.getElementById('f-location').value.trim(),
     email: document.getElementById('f-email').value.trim() || null, bio: document.getElementById('f-bio').value.trim(),
     approach: document.getElementById('f-approach').value.trim(), faith, angle: document.getElementById('f-angle').value.trim(),
-    tags, priority, faith_confirmed: faith.length > 0, score: priority === 'high' ? 80 : priority === 'medium' ? 60 : 40, news: []
+    tags, priority, score: priority === 'high' ? 80 : priority === 'medium' ? 60 : 40, news: []
   };
 
   if (editingId !== null) {
@@ -590,7 +605,10 @@ async function savePerson() {
     if (error) { alert('Could not save: ' + error.message); return; }
   } else {
     const maxId = people.reduce((m, p) => Math.max(m, p.id), 0);
-    const { error } = await supabase.from('prospects').insert({ id: maxId + 1, list: activeList, ...data });
+    const list = document.getElementById('f-list').value;
+    const { error } = await supabase.from('prospects').insert({
+      id: maxId + 1, list, manually_added: true, faith_confirmed: false, ...data
+    });
     if (error) { alert('Could not add prospect: ' + error.message); return; }
   }
 
@@ -613,17 +631,82 @@ function requireConnection() {
   return true;
 }
 
+// ── GOALS / KPIs ─────────────────────────────────────────────────────────────
+function renderGoals() {
+  const openList = document.getElementById('goals-open-list');
+  const doneList = document.getElementById('goals-done-list');
+  if (!openList || !doneList) return;
+
+  const open = goals.filter(g => !g.completed);
+  const done = goals.filter(g => g.completed);
+
+  openList.innerHTML = open.length
+    ? open.map(goalRowHtml).join('')
+    : '<div class="touchpoint-empty">No open goals yet — add one above.</div>';
+
+  doneList.innerHTML = done.length
+    ? done.map(goalRowHtml).join('')
+    : '<div class="touchpoint-empty">Nothing completed yet.</div>';
+}
+
+function goalRowHtml(g) {
+  const today = new Date().toISOString().slice(0, 10);
+  const overdue = !g.completed && g.due_date && g.due_date < today;
+  return `
+    <div class="goal-row ${g.completed ? 'goal-row-done' : ''} ${overdue ? 'goal-row-overdue' : ''}">
+      <input type="checkbox" ${g.completed ? 'checked' : ''} onchange="toggleGoalComplete(${g.id}, this.checked)"/>
+      <div class="goal-row-text">
+        <div class="goal-row-title">${escapeHtml(g.title)}</div>
+        <div class="goal-row-meta">
+          ${g.due_date ? `Due ${formatDate(g.due_date)}${overdue ? ' — overdue' : ''}` : 'No due date'}
+          ${g.completed && g.completed_at ? ` · Completed ${formatDate(g.completed_at)}` : ''}
+        </div>
+      </div>
+      <button class="touchpoint-del" title="Delete" onclick="deleteGoal(${g.id})">×</button>
+    </div>`;
+}
+
+async function addGoal() {
+  if (!requireConnection()) return;
+  const title = document.getElementById('goal-title').value.trim();
+  if (!title) { alert('Enter a goal description first.'); return; }
+  const dueDate = document.getElementById('goal-due-date').value || null;
+  const { error } = await supabase.from('goals').insert({ title, due_date: dueDate });
+  if (error) { alert('Could not add goal: ' + error.message); return; }
+  document.getElementById('goal-title').value = '';
+  document.getElementById('goal-due-date').value = '';
+  await reloadGoals();
+  renderGoals();
+}
+
+async function toggleGoalComplete(id, checked) {
+  if (!requireConnection()) return;
+  const g = goals.find(x => x.id === id);
+  if (g) { g.completed = checked; g.completed_at = checked ? new Date().toISOString().slice(0, 10) : null; }
+  renderGoals();
+  const { error } = await supabase.from('goals').update({
+    completed: checked, completed_at: checked ? new Date().toISOString().slice(0, 10) : null
+  }).eq('id', id);
+  if (error) console.error('toggleGoalComplete failed:', error);
+}
+
+async function deleteGoal(id) {
+  if (!requireConnection()) return;
+  if (!confirm('Delete this goal?')) return;
+  const { error } = await supabase.from('goals').delete().eq('id', id);
+  if (error) { alert('Could not delete: ' + error.message); return; }
+  await reloadGoals();
+  renderGoals();
+}
+
 // ── STATS ───────────────────────────────────────────────────────────────────
 function updateStats() {
-  const scoped = peopleInActiveList();
-  const scopedIds = new Set(scoped.map(p => p.id));
+  const scoped = people;
   const high = scoped.filter(p => p.priority === 'high').length;
   const medium = scoped.filter(p => p.priority === 'medium').length;
   const faith = scoped.filter(p => p.faith_confirmed).length;
   const contacted = scoped.filter(p => p.stage).length;
-  const meetings = Object.entries(touchpointsByProspect)
-    .filter(([pid]) => scopedIds.has(Number(pid)))
-    .reduce((sum, [, list]) => sum + list.filter(t => t.type === 'Meeting').length, 0);
+  const meetings = Object.values(touchpointsByProspect).reduce((sum, list) => sum + list.filter(t => t.type === 'Meeting').length, 0);
   const followup = scoped.filter(needsFollowup).length;
 
   setText('nav-green', high);
@@ -636,6 +719,7 @@ function updateStats() {
   setText('cta-green-count', high);
   setText('cta-yellow-count', medium);
   setText('cta-faith-count', faith);
+  setText('cta-contacted-count', contacted);
   setText('cta-all-count', scoped.length);
 
   setText('st-high', high);
@@ -661,7 +745,7 @@ function getTierLabel(tier) { return tier === 'Whale' ? 'Whale' : tier === 'Revi
 function getTierRowClass(tier) { return tier === 'Whale' ? 'tier-whale' : tier === 'Review' ? 'tier-review' : tier === 'Contact' ? 'tier-contact' : 'tier-unset'; }
 
 function getStageClass(stage) {
-  return { Emailed: 'stage-emailed', Interested: 'stage-interested', 'Met with': 'stage-met', Confirmed: 'stage-confirmed' }[stage] || 'stage-none';
+  return { 'Needs to be Contacted': 'stage-needed', Emailed: 'stage-emailed', Interested: 'stage-interested', 'Met with': 'stage-met', Confirmed: 'stage-confirmed' }[stage] || 'stage-none';
 }
 
 function formatDate(d) {
@@ -690,7 +774,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── EXPOSE TO INLINE HTML HANDLERS ────────────────────────────────────────────
 Object.assign(window, {
-  showHero, showList, switchList, openForm, openEdit, closeForm, savePerson, deletePerson,
+  showHero, showList, showSection, openForm, openEdit, closeForm, savePerson, deletePerson,
   renderList, unlockEmail, saveEmails, navigateDetail, updateTier, updateStage,
-  addTouchpoint, deleteTouchpoint, copyDraftEmail
+  addTouchpoint, deleteTouchpoint, copyDraftEmail, toggleFaithConfirmed,
+  addGoal, toggleGoalComplete, deleteGoal
 });

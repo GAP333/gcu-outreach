@@ -4,6 +4,20 @@ All notable changes to the GCU Prospect Pipeline are logged here, newest first. 
 
 ---
 
+## 2026-06-16 (4) — Unified the two lists, added Goals/KPIs, fixed faith-confirmed count
+
+**Changed**
+- Replaced the SOHK/KIC tab switcher with one unified Prospects view — both lists show together by default, with a "Both Lists" filter dropdown if you want to narrow to just one. Reversed the earlier tabs decision based on feedback.
+- Every prospect's detail page now shows a small badge noting its source list (School of Hard Knocks / Kingdom Impact Council), and a separate badge if it was added manually through the app instead of imported.
+- The "Add Prospect" form now has a List selector (since there's no active tab to infer it from anymore).
+- Added a "Contacted" button on the hero page (and matching stat), showing everyone with any engagement stage set — this was missing before.
+- **Faith Confirmed is now manual only.** It used to auto-set to true for any KIC record whose bio text mentioned anything faith-related, which wrongly flagged ~850 unconfirmed background-research people (only 122 of the 972 "confirmed" were actually on the real shortlist). Added a checkbox on the detail page (under FAITH SIGNAL) so the team confirms it by hand going forward. Newly added prospects also start unconfirmed now instead of being auto-set from whether a Faith Signal note was typed in.
+
+**Added**
+- A new **Goals & KPIs** tab: add a goal with an optional due date, check it off when done (records the completion date automatically), delete what you don't need. New `goals` table in Supabase, fully realtime-synced like everything else.
+
+**Note on the "31 needs to be contacted" question:** that number was almost certainly a filtered selection made directly in the old gcu-live app's browser (saved to that browser's local storage, not in the deployed file), since every single record in the extracted bundle had its status hardcoded to "Not contacted" with no per-person variation. That selection isn't recoverable from the bundle — it would only still exist in whichever browser was used to make it, if that browser's data hasn't been cleared.
+
 ## 2026-06-16 (3) — Merged in the real Kingdom Impact Council data
 
 **What:** Pulled the compiled JS bundle from the live `gcu-live.vercel.app` deployment and extracted all 976 prospect records (Sam grabbed the file from DevTools and uploaded it). Mapped them into the shared schema and seeded them into the KIC tab.

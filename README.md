@@ -34,11 +34,11 @@ Until step 4 is done, the site will show a yellow "not connected" banner and not
 
 Every prospect and every touchpoint lives in Supabase, not in the browser. When anyone adds a prospect, changes a tier/stage, saves an email, or logs a touchpoint, it writes straight to the database. Every other open tab is subscribed to Supabase's realtime feed and automatically refreshes when anything changes — so two people working the list at the same time both stay in sync without refreshing.
 
-## Two lists, one app
+## One unified list, plus Goals
 
-This is now a combined tool with two tabs in the nav bar: **School of Hard Knocks** and **Kingdom Impact Council**. They share one codebase, one Supabase database, and one touchpoint tracker — but each tab only shows its own prospects, filters, categories, and stats. Every prospect row has a `list` column (`SOHK` or `KIC`) that controls which tab it shows up in. Adding a new prospect always tags it with whichever tab you're currently on.
+The nav bar now has two tabs: **Prospects** and **Goals & KPIs**. Prospects shows School of Hard Knocks and Kingdom Impact Council people together in the same place — there's a "Both Lists" filter dropdown if you want to narrow to just one. Every prospect's detail page shows a small badge noting which list they originally came from, and another badge if they were added manually through the "+ Add Prospect" form rather than imported.
 
-**KIC data status:** real. All 976 records from the live `gcu-live.vercel.app` bundle are merged in — 73 flagged green (→ High Priority), 53 flagged yellow (→ Medium), and the remaining ~850 are background research with no flag (→ Low Priority, so they don't clutter the main views but aren't lost). KIC ids start at 1000 so they never collide with SOHK's 1–86.
+**KIC data status:** real. All 976 records from the live `gcu-live.vercel.app` bundle are merged in — 73 flagged green (→ High Priority), 53 flagged yellow (→ Medium), and the remaining ~850 are background research with no flag (→ Low Priority, so they don't clutter the main views but aren't lost).
 
 A few fields didn't map directly onto the shared schema, so here's what happened to them:
 - The original A/B/C/D quality grade was dropped — the numeric `score` (0–100) already does that ranking job, and Tier (Whale/Review/Contact) means something different on the SOHK side.
@@ -46,6 +46,11 @@ A few fields didn't map directly onto the shared schema, so here's what happened
 - `boards` (other board memberships) got appended to the end of `bio` when present.
 - Two new fields came over that SOHK doesn't have: `notable` (a one-line "why this person matters" tag, shown as a highlighted callout above the bio) and `draft_email` (a pre-written outreach draft, shown in its own sidebar card with a copy button, when one exists).
 - `sourceUrls` now actually populates the "Verified Sources & Articles" panel, which existed in the markup before but was never wired up to anything.
+- `faith_confirmed` is **manual only** now — it used to auto-set to true for any KIC record whose bio mentioned anything faith-related, which wrongly flagged ~850 unconfirmed background-research people. Now nobody's flagged automatically; check the box on a person's detail page (under FAITH SIGNAL) once you've actually confirmed it.
+
+## Goals & KPIs
+
+A simple tracker, separate from the prospect lists: add a goal with an optional due date, check it off when it's done (the completion date gets recorded automatically), delete anything you don't need. Meant for you to populate by hand.
 
 ## Engagement stages
 
@@ -58,5 +63,6 @@ Each prospect's detail page has a touchpoint log — every call, email, meeting,
 ## Known limitations
 
 - New prospect IDs are computed client-side as `max(existing id across both lists) + 1`. If two people hit "Save" on a brand-new prospect at the exact same moment, there's a small chance of an ID collision. Not expected to come up often with a small team, but worth knowing.
-- The Supabase anon key has full read/write access to both tables (gated by the fact that it's not published anywhere public). Don't post the deployed URL or this repo somewhere public-facing without locking that down further.
-- The "Add Prospect" category field is now a free-text input (with autocomplete from whatever categories already exist on the active tab) instead of a fixed dropdown, since SOHK and KIC use different category sets. Type a new one any time.
+- The Supabase anon key has full read/write access to all tables (gated by the fact that it's not published anywhere public). Don't post the deployed URL or this repo somewhere public-facing without locking that down further.
+- The "Add Prospect" category field is now a free-text input (with autocomplete from whatever categories already exist) instead of a fixed dropdown, since SOHK and KIC use different category sets. Type a new one any time.
+- Editing an existing prospect doesn't let you move it between the SOHK and KIC lists — the List dropdown only applies when adding something new.

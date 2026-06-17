@@ -22,8 +22,8 @@
     <span class="nav-logo-text" id="nav-logo-text">Prospect Pipeline</span>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab" id="tab-SOHK" onclick="switchList('SOHK')">School of Hard Knocks</button>
-    <button class="nav-tab" id="tab-KIC" onclick="switchList('KIC')">Kingdom Impact Council</button>
+    <button class="nav-tab" id="tab-prospects" onclick="showSection('prospects')">Prospects</button>
+    <button class="nav-tab" id="tab-goals" onclick="showSection('goals')">Goals &amp; KPIs</button>
   </div>
   <div class="nav-center" id="nav-stats">
     <span><span class="nav-dot-orange" id="nav-followup">0</span> need follow-up</span>
@@ -36,13 +36,14 @@
 <!-- HERO PAGE -->
 <div id="page-hero">
   <div class="hero">
-    <div class="hero-label" id="hero-label">SOHK Prospect Pipeline · Grand Canyon University</div>
-    <div class="hero-title" id="hero-title">School of Hard Knocks<br>Pipeline.</div>
+    <div class="hero-label" id="hero-label">GCU Prospect Pipeline</div>
+    <div class="hero-title" id="hero-title">School of Hard Knocks<br>&amp; Kingdom Impact Council.</div>
     <div class="hero-sub" id="hero-sub">Loading prospects researched and scored for GCU outreach.</div>
     <div class="hero-ctas">
       <button class="cta-btn cta-green" onclick="showList('high')"><span id="cta-green-count">0</span> High Priority prospects →</button>
       <button class="cta-btn cta-yellow" onclick="showList('medium')"><span id="cta-yellow-count">0</span> Medium prospects →</button>
       <button class="cta-btn cta-orange" onclick="showList('faith')"><span id="cta-faith-count">0</span> Faith confirmed →</button>
+      <button class="cta-btn cta-blue" onclick="showList('contacted')"><span id="cta-contacted-count">0</span> Contacted →</button>
       <button class="cta-btn cta-outline" onclick="showList('all')">View all <span id="cta-all-count">0</span> →</button>
     </div>
   </div>
@@ -92,6 +93,11 @@
   <div class="list-controls">
     <input class="list-search" id="list-search" placeholder="Search name, company, category…" oninput="renderList()">
     <select class="list-filter" id="list-cat" onchange="renderList()"><option value="">All Categories</option></select>
+    <select class="list-filter" id="list-source" onchange="renderList()">
+      <option value="">Both Lists</option>
+      <option value="SOHK">School of Hard Knocks</option>
+      <option value="KIC">Kingdom Impact Council</option>
+    </select>
     <select class="list-filter" id="list-faith" onchange="renderList()">
       <option value="">All Prospects</option>
       <option value="faith">Faith Confirmed</option>
@@ -109,6 +115,7 @@
     <select class="list-filter" id="list-stage" onchange="renderList()">
       <option value="">All Stages</option>
       <option value="none">Not Started</option>
+      <option value="Needs to be Contacted">Needs to be Contacted</option>
       <option value="Emailed">Emailed</option>
       <option value="Interested">Interested</option>
       <option value="Met with">Met with</option>
@@ -149,6 +156,7 @@
   <div class="detail-body">
     <div class="detail-main">
       <div>
+        <div class="detail-origin-notes" id="d-origin-notes"></div>
         <div class="detail-notable" id="d-notable" style="display:none"></div>
         <div class="detail-section-label">BIOGRAPHY</div>
         <div class="detail-bio" id="d-bio"></div>
@@ -217,6 +225,10 @@
       <div class="sidebar-card">
         <div class="sidebar-card-label">FAITH SIGNAL</div>
         <div class="sidebar-card-text" id="d-faith"></div>
+        <label class="faith-confirm-toggle">
+          <input type="checkbox" id="d-faith-confirmed-check" onchange="toggleFaithConfirmed(this.checked)"/>
+          Mark as Faith Confirmed
+        </label>
       </div>
       <div class="sidebar-card">
         <div class="sidebar-card-label">TAGS</div>
@@ -240,13 +252,18 @@
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Company / Org</label><input class="form-input" id="f-org" placeholder="Organization"></div>
+        <div class="form-group"><label class="form-label">List</label>
+          <select class="form-select" id="f-list">
+            <option value="SOHK">School of Hard Knocks</option>
+            <option value="KIC">Kingdom Impact Council</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
         <div class="form-group"><label class="form-label">Category</label>
           <input class="form-input" id="f-category" list="category-suggestions" placeholder="e.g. Entrepreneur, Faith Leader…">
           <datalist id="category-suggestions"></datalist>
         </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="f-location" placeholder="City, State"></div>
         <div class="form-group"><label class="form-label">Priority</label>
           <select class="form-select" id="f-priority">
             <option value="high">High Priority</option>
@@ -254,6 +271,9 @@
             <option value="low">Low</option>
           </select>
         </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full"><label class="form-label">Location</label><input class="form-input" id="f-location" placeholder="City, State"></div>
       </div>
       <div class="form-group full"><label class="form-label">Email / Contact</label><input class="form-input" id="f-email" placeholder="email@domain.com"></div>
       <div class="form-group full"><label class="form-label">Biography</label><textarea class="form-textarea" id="f-bio" placeholder="Background, achievements, net worth…"></textarea></div>
@@ -270,6 +290,22 @@
 </div>
 
 <footer>Grand Canyon University · Prospect Intelligence · School of Hard Knocks &amp; Kingdom Impact Council</footer>
+
+<!-- GOALS / KPIs PAGE -->
+<div class="goals-view" id="page-goals" style="display:none">
+  <div class="list-header">
+    <div class="list-title">Goals &amp; KPIs</div>
+  </div>
+  <div class="goal-form">
+    <input type="text" id="goal-title" class="goal-title-input" placeholder="Goal or KPI description…"/>
+    <input type="date" id="goal-due-date" class="goal-date-input"/>
+    <button class="touchpoint-add-btn" onclick="addGoal()">+ Add Goal</button>
+  </div>
+  <div class="goal-section-label">OPEN</div>
+  <div id="goals-open-list" class="goals-list"></div>
+  <div class="goal-section-label">COMPLETED</div>
+  <div id="goals-done-list" class="goals-list"></div>
+</div>
 
 <script type="module" src="app.js"></script>
 </body>
