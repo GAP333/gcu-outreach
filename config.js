@@ -7,8 +7,8 @@
 // row-level security policies in schema.sql) so it's safe to commit here.
 // ============================================================================
 
-export const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_PROJECT_URL_HERE';
-export const SUPABASE_ANON_KEY = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+export const SUPABASE_URL = 'https://lpmumgnxdhyfoxazsiyy.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwbXVtZ254ZGh5Zm94YXpzaXl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MDY2NTUsImV4cCI6MjA5NTM4MjY1NX0.GJ6JEtnFhDh5Ng1yGXT5KwIaIo6Aafe6w28WQ98IUKk';
 
 export const isConfigured =
   SUPABASE_URL.startsWith('http') &&
